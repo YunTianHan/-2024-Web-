@@ -1,0 +1,23 @@
+{
+  "id": "4498427",
+  "name": "system",
+  "font_family": "iconfont",
+  "css_prefix_text": "icon-",
+  "description": "Student老师管理系统",
+  "glyphs": [
+    {
+      "icon_id": "8455371",
+      "name": "用户名",
+      "font_class": "yonghuming",
+      "unicode": "e619",
+      "unicode_decimal": 58905
+    },
+    {
+      "icon_id": "11855593",
+      "name": "密码",
+      "font_class": "mima",
+      "unicode": "e608",
+      "unicode_decimal": 58888
+    }
+  ]
+}

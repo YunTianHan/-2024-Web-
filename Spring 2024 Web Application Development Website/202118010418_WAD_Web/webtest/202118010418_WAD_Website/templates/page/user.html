@@ -1,0 +1,355 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <!-- 用户管理 -->
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="ie=edge" />
+    <meta
+      name="viewport"
+      content="width=device-width, user-scalable=no, initial-scale=1.0"
+    />
+    <link rel="stylesheet" href="../../static/css/reset.css" />
+    <link rel="stylesheet" href="../../static/css/common.css" />
+    <link rel="stylesheet" href="../../static/css/message.css" />
+    <link rel="stylesheet" href="../../static/css/page.css" />
+    <title>CoursewareManagement</title>
+  </head>
+
+  <body>
+    <div class="w100w h100h p_relative box-sizing padding-sm flex-column">
+      <div class="search_form flex align-center">
+        <div class="flex margin-right-xl">
+          <div class="field both flex align-center">
+            <span>CustomerType：</span>
+            <div class="filter-box select1">
+              <div class="filter-text">
+                <input
+                  class="filter-title"
+                  type="text"
+                  readonly
+                  placeholder="Please select"
+                />
+                <i class="icon icon-filter-arrow"></i>
+              </div>
+              <select class="usertype" name="filter">
+                <option value="" selected>All</option>
+                <option value="0">Admin</option>
+                <option value="1">Instructor</option>
+                <option value="2">Student</option>
+              </select>
+            </div>
+          </div>
+          <div class="field both">
+            <span>UserName：</span>
+            <input
+              id="username"
+              class="field_input"
+              type="text"
+              placeholder="Please enter"
+            />
+          </div>
+        </div>
+        <div class="flex align-center text-lg">
+          <button id="search" class="def_btn bg-blue">Search</button>
+          <button id="add" class="def_btn bg-orange">Add</button>
+        </div>
+      </div>
+      <div class="flex1 margin-top-sm">
+        <table class="tableBox">
+          <thead>
+            <tr class="w100 flex align-center">
+              <th class="w10">ID</th>
+              <th class="flex1">Username</th>
+              <th class="flex1">AddTime</th>
+              <th style="width: 200px">Operation</th>
+            </tr>
+          </thead>
+          <tbody class="tg-scroll"></tbody>
+        </table>
+      </div>
+
+      <!-- 模态窗 -->
+      <div class="modal">
+        <div class="form">
+          <div class="text-df text-bold">
+            <span class="modal_title">Add</span
+            ><span class="closeModal pointer"> X </span>
+          </div>
+          <hr />
+          <div class="flex flex-column padding-tb padding-lr-sm">
+            <div class="field flex align-center margin-bottom">
+              <span class="field_label">UserName：</span>
+              <input
+                id="modal_username"
+                class="field_input flex1"
+                type="text"
+                placeholder="Please enter"
+              />
+            </div>
+            <div class="need_hide field flex align-center margin-bottom">
+              <span class="field_label">Password：</span>
+              <input
+                id="modal_password"
+                class="field_input flex1"
+                type="text"
+                placeholder="Please enter"
+              />
+            </div>
+            <div class="need_hide field flex align-center margin-bottom">
+              <span class="field_label">Age：</span>
+              <input
+                id="modal_age"
+                class="field_input flex1"
+                type="text"
+                placeholder="Please enter"
+              />
+            </div>
+            <div class="field flex align-center margin-bottom">
+              <span class="field_label">CustomerType：</span>
+              <div class="flex1 filter-box select2">
+                <div class="filter-text">
+                  <input
+                    class="filter-title modal_type"
+                    type="text"
+                    readonly
+                    placeholder="Please select"
+                  />
+                  <i class="icon icon-filter-arrow"></i>
+                </div>
+                <select class="modal-filter-type" name="filter">
+                  <option value="0">Admin</option>
+                  <option value="1">Instructor</option>
+                  <option value="2">Student</option>
+                </select>
+              </div>
+            </div>
+            <div class="need_hide field flex align-center">
+              <span class="field_label">Sex：</span>
+              <div class="flex1 filter-box select3">
+                <div class="filter-text">
+                  <input
+                    class="filter-title modal-filter-sex"
+                    type="text"
+                    readonly
+                    placeholder="Please select"
+                  />
+                  <i class="icon icon-filter-arrow"></i>
+                </div>
+                <select name="filter">
+                  <option value="boy">Male</option>
+                  <option value="girl">FeMale</option>
+                </select>
+              </div>
+            </div>
+          </div>
+          <div class="flex align-center justify-center">
+            <div class="flex">
+              <button class="closeModal def_btn bg-white">Close</button>  
+              <button class="addInfo def_btn bg-blue">Confirm</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <style type="text/css"></style>
+    <script src="../../static/js/jquery.js"></script>
+    <script src="../../static/js/select.js"></script>
+    <script src="../../static/js/request.js"></script>
+    <script src="../../static/js/storage.js"></script>
+    <script src="../../static/js/message.js"></script>
+    <script src="../../static/js/utils.js"></script>
+    <script>
+      $(function () {
+        let list = [];
+        let update_id;
+        let logindata = load("logindata") || {};
+        function getList() {
+          let type = $(".usertype").val();
+          console.log("type ==", type);
+          let identity = type === "" ? undefined : ~~type;
+          let username = $("#username").val().trim();
+          let params = {
+            userId: logindata.id,
+            identity,
+            username,
+          };
+          post(
+            "/userList",
+            params || {},
+            function (res) {
+              if (res) {
+                list = res.data || [];
+                updateList();
+              }
+            },
+            function (err) {}
+          );
+        }
+        getList();
+        $("#search").click(function () {
+          getList();
+        });
+        $("#add").click(function () {
+          showModal();
+        });
+        $(".closeModal").click(function () {
+          closeModal();
+        });
+        $(".addInfo").click(function () {
+          let username = $("#modal_username").val().trim();
+          let password = $("#modal_password").val().trim();
+          let age = $("#modal_age").val().trim();
+          let identity = $(".modal-filter-type").val();
+          let sex = $(".modal-filter-sex").val();
+          if (
+            update_id
+              ? !username || !identity
+              : !username || !password || !age || !identity || !sex
+          ) {
+            $.message({
+              type: "error",
+              content: "The form is not filled out completely!",
+            });
+            return;
+          }
+          post(
+            "/addOrUpdateUser",
+            {
+              id: update_id,
+              username,
+              password,
+              age,
+              identity: ~~identity,
+              sex,
+              addTime: update_id ? undefined : getNow(),
+            },
+            function (res) {
+              getList();
+              closeModal();
+            },
+            function (err) {
+              if (err && err.code == -1) {
+                $.message({
+                  type: "error",
+                  content: "User already exists！",
+                });
+              }
+            }
+          );
+        });
+        $("tbody").on("click", "#delete,#update", function (e) {
+          if (e.target.id === "delete") {
+            let id = ~~$(this)
+              .parent()
+              .parent()
+              .parent()
+              .children()
+              .eq(0)
+              .text();
+            post(
+              "/rmUser",
+              {
+                id,
+              },
+              function (res) {
+                $.message({
+                  type: "success",
+                  content: "Operation successful！",
+                });
+                getList();
+              },
+              function (err) {}
+            );
+          }
+          if (e.target.id === "update") {
+            update_id = ~~$(this)
+              .parent()
+              .parent()
+              .parent()
+              .children()
+              .eq(0)
+              .text();
+            const data = list.find((i) => i.id == update_id) || {};
+            $("#modal_username").val(data.username || "");
+            $("#modal_password").val(data.password || "");
+            $("#modal_age").val(data.age || "");
+            $(".modal-filter-type").val(data.identity || "");
+            $(".modal_type").val(logindata.typeObj[~~data.identity] || "");
+            $(".modal-filter-sex").val(data.sex || "");
+            showModal();
+          }
+        });
+
+        //渲染列表数据
+        function updateList() {
+          $("tbody").html("");
+          if (list && list.length) {
+            $("tbody").prepend(
+              list.reduce(
+                (t, c) =>
+                  (t += ` <tr class="w100 flex align-center">
+              <td class="w10">${c.id || ""}</td>
+              <td class="flex1">${c.username || ""}</td>
+              <td class="flex1">${c.addTime || ""}</td>
+              <td style="width: 200px" >
+                <div class="w100 flex justify-around" style="margin: 10px 0">
+                    <button id="update" class="td_btn bg-orange ">Modify</button>
+                    <button id="delete" class="td_btn bg-red ">Delete</button>
+                </div>
+                    </td>
+      </tr>`),
+                ""
+              )
+            );
+          }
+        }
+
+        $(".select1").selectFilter({
+          callBack: function (val) {
+            //返回选择的值
+            console.log(val + "-是返回的值");
+          },
+        });
+        $(".select2").selectFilter({
+          callBack: function (val) {
+            //返回选择的值
+            console.log(val + "-是返回的值");
+          },
+        });
+        $(".select3").selectFilter({
+          callBack: function (val) {
+            //返回选择的值
+            console.log(val + "-是返回的值");
+          },
+        });
+
+        function showModal() {
+          $(".modal_title").text(update_id ? "Modify" : "Add");
+          $("#modal_username").attr(
+            "readonly",
+            update_id ? logindata.identity === 0 : false
+          );
+          $(".modal-filter-type").attr(
+            "readonly",
+            update_id ? logindata.identity !== 0 : false
+          );
+          $(".need_hide")[
+            logindata.identity === 0 && update_id ? "hide" : "show"
+          ]();
+          $(".modal").fadeIn();
+        }
+        function closeModal() {
+          $(".modal").fadeOut();
+          $("#modal_username").val("");
+          $("#modal_password").val("");
+          $("#modal_age").val("");
+          $(".modal-filter-type").val("");
+          $(".modal_type").val("");
+          $(".modal-filter-sex").val("");
+          update_id = undefined;
+        }
+      });
+    </script>
+  </body>
+</html>

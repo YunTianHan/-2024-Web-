@@ -1,0 +1,415 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <!-- 作业回复 -->
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="ie=edge" />
+    <meta
+      name="viewport"
+      content="width=device-width, user-scalable=no, initial-scale=1.0"
+    />
+    <link rel="stylesheet" href="../../static/css/reset.css" />
+    <link rel="stylesheet" href="../../static/css/common.css" />
+    <link rel="stylesheet" href="../../static/css/message.css" />
+    <link rel="stylesheet" href="../../static/css/page.css" />
+    <title>FeedbackAndGrdes</title>
+  </head>
+
+  <body>
+    <div class="w100w h100h p_relative box-sizing padding-sm flex-column">
+      <div class="search_form flex align-center">
+        <div class="flex margin-right-xl">
+          <div id="jobField" class="field both flex align-center">
+            <span>Job：</span>
+            <div class="filter-box select">
+              <div class="filter-text">
+                <input
+                  class="filter-title"
+                  type="text"
+                  readonly
+                  placeholder="Please select"
+                />
+                <i class="icon icon-filter-arrow"></i>
+              </div>
+              <select id="job-select" name="filter"></select>
+            </div>
+          </div>
+        </div>
+        <div class="flex align-center text-lg">
+          <button id="search" class="def_btn bg-blue">Search</button>
+        </div>
+      </div>
+      <div class="flex1 margin-top-sm">
+        <table class="tableBox">
+          <thead>
+            <tr class="w100 flex align-center">
+              <th class="w10">ID</th>
+              <th class="flex1">Reply content</th>
+              <th class="flex1">AddTime</th>
+              <th class="flex1">FilePath</th>
+              <th class="flex1">Score</th>
+              <th class="flex1">Feedback</th>
+              <th class="flex1">UserName</th>
+              <th style="width: 250px">Operation</th>
+            </tr>
+          </thead>
+          <tbody class="tg-scroll"></tbody>
+        </table>
+      </div>
+
+      <!-- 评分 -->
+      <div id="scoreModal" class="modal">
+        <div class="form">
+          <div class="text-df text-bold">
+            <span class="modal_title">Scoring</span
+            ><span class="closeScoreModal pointer"> X </span>
+          </div>
+          <hr />
+          <div class="flex flex-column padding-tb padding-lr-sm">
+            <div class="field flex align-center">
+              <span class="field_label">Score：</span>
+              <input
+                id="modal_score"
+                class="field_input"
+                type="number"
+                max="100"
+                min="0"
+                placeholder="Between 0 ~ 100"
+              />
+            </div>
+            <div class="field flex align-center margin-top">
+              <span class="field_label">Feedback：</span>
+              <textarea
+                id="modal_evaluate"
+                class="field_input"
+                rows="5"
+                placeholder="Please enter"
+              ></textarea>
+            </div>
+          </div>
+          <div class="flex align-center justify-center">
+            <div class="flex">
+              <button class="closeScoreModal def_btn bg-white">Close</button>  
+              <button class="scoreConfirm def_btn bg-blue">Confirm</button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- 新增作业修改模态窗 -->
+      <div id="add_job_modal" class="modal">
+        <div class="form">
+          <div class="text-df text-bold">
+            <span class="modal_title">Modify</span
+            ><span class="closeJobModal pointer"> X </span>
+          </div>
+          <hr />
+          <div class="flex flex-column padding-tb padding-lr-sm">
+            <div class="field flex align-center">
+              <span class="field_label">Name：</span>
+              <input
+                id="modal_name"
+                class="field_input flex1"
+                type="text"
+                placeholder="Please enter"
+              />
+            </div>
+            <div class="field flex align-center margin-top">
+              <span class="field_label">Description：</span>
+              <textarea
+                id="modal_job_description"
+                class="field_input"
+                rows="5"
+                placeholder="Please enter"
+              ></textarea>
+            </div>
+            <div class="field flex align-center margin-top">
+              <span class="field_label">EndTime：</span>
+              <input
+                id="modal_job_endTime"
+                class="field_input flex1"
+                type="datetime-local"
+                lang="en"
+                placeholder="Please enter"
+              />
+            </div>
+            <div class="p_relative margin-top">
+              <button class="w100 def_btn bg-white">UploadFile</button>  
+              <input
+                class="p_absolute"
+                id="fileInput"
+                style="opacity: 0; margin-bottom: 0; left: 0; top: 0"
+                type="file"
+              />
+            </div>
+            <a id="file_name" href="" target="_blank"></a>
+          </div>
+          <div class="flex align-center justify-center">
+            <div class="flex">
+              <button class="closeJobModal def_btn bg-white">Close</button>  
+              <button class="addJobInfo def_btn bg-blue">Confirm</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <style type="text/css"></style>
+    <script src="../../static/js/jquery.js"></script>
+    <script src="../../static/js/select.js"></script>
+    <script src="../../static/js/request.js"></script>
+    <script src="../../static/js/storage.js"></script>
+    <script src="../../static/js/message.js"></script>
+    <script src="../../static/js/utils.js"></script>
+    <script>
+      $(function () {
+        let logindata = load("logindata") || {};
+        let list = [];
+        let userList = [];
+        let jobList = [];
+        let searchData = {};
+        let anserId;
+        let update_id;
+        let filePath;
+        if (logindata.identity === 2) {
+          searchData.studentId = logindata.id;
+          $(".search_form").hide();
+        }
+
+        function getList() {
+          let params = {
+            ...searchData,
+          };
+          post(
+            "/answer",
+            params || {},
+            function (res) {
+              if (res) {
+                list = res.data || [];
+                updateList();
+              }
+            },
+            function (err) {}
+          );
+        }
+        function getUser() {
+          post(
+            "/homework",
+            { teacherId: logindata.id },
+            function (res) {
+              if (res) {
+                userList = res.data || [];
+                updateSelect("job-select", "select", userList, (val) => {
+                  searchData.homeworkId = val;
+                });
+                const hrefData = load("jobParams");
+                if (hrefData) {
+                  $(".filter-title").val(hrefData.jobName || "");
+                  searchData.homeworkId = hrefData.jobId;
+                  save("jobParams", "");
+                }
+              }
+              getList();
+            },
+            function (err) {}
+          );
+        }
+
+        function getJob() {
+          post(
+            "/getAssignment",
+            { userId: logindata.id },
+            function (res) {
+              if (res) {
+                jobList = res.data.assData || [];
+                updateSelect("assignment-select", "select1", jobList, (val) => {
+                  searchData.assignmentId = val;
+                });
+              }
+            },
+            function (err) {}
+          );
+        }
+
+        if (logindata.identity === 1) {
+          getUser();
+        } else {
+          getList();
+        }
+
+        $("tbody").on(
+          "click",
+          "#preview,#download,#scoring,#modify",
+          function (e) {
+            if (e.target.id === "download") {
+              const url = $(this)
+                .parent()
+                .parent()
+                .parent()
+                .children()
+                .eq(3)
+                .text();
+              const link = document.createElement("a");
+              link.download = "file";
+              link.href = url;
+              link.click();
+            }
+            if (e.target.id === "preview") {
+              const path = $(this).parent().parent().children().eq(3).text();
+              window.open(path);
+            }
+            if (e.target.id === "modify") {
+              update_id = ~~$(this)
+                .parent()
+                .parent()
+                .parent()
+                .children()
+                .eq(0)
+                .text();
+              showAddJobModal();
+            }
+            if (e.target.id == "scoring") {
+              anserId = ~~$(this)
+                .parent()
+                .parent()
+                .parent()
+                .children()
+                .eq(0)
+                .text();
+              showScoreModal();
+              return;
+            }
+          }
+        );
+        // setTimeout(() => {
+        //   getJob();
+        // }, 1000);
+        $("#search").click(function () {
+          getList();
+        });
+
+        //渲染列表数据
+        function updateList() {
+          $("tbody").html("");
+          if (list && list.length) {
+            $("tbody").prepend(
+              list.reduce(
+                (t, c) =>
+                  (t += ` <tr class="w100 flex align-center">
+                <td class="w10">${c.id || ""}</td>
+                <td class="flex1">${c.content || ""}</td>
+                <td class="flex1">${c.addTime || ""}</td>
+                <td class="flex1 ellipsis pointer">
+                  <a id="preview">${c.filePath || ""}</a>
+                </td>
+                <td class="flex1">${c.score || ""}</td>
+                <td class="flex1">${c.feedback || ""}</td>
+                <td class="flex1">${c.username || ""}</td>
+                <td style="width: 250px" >
+                  <div class="w100 flex justify-around" style="margin: 10px 0">
+                    
+                    <button id="download" class="td_btn bg-blue ">Download</button>
+                  ${
+                    logindata.type === "Instructor" && !c.score
+                      ? '</button><button id="scoring" class="td_btn bg-green ">Scoring</button>'
+                      : ""
+                  }
+                  </div>
+                </td>
+        </tr>`),
+                ""
+              )
+            );
+          }
+        }
+
+        function updateSelect(
+          id,
+          selectClass,
+          list,
+          selectFun,
+          needAll = true
+        ) {
+          $(`#${id}`).html("");
+          if (needAll) {
+            $(`#${id}`).append("<option selected value=''>All</option>");
+          }
+          if (list && list.length) {
+            const _html = list.reduce(
+              (t, c) =>
+                (t += `<option value=${c.id}>${c.username || c.name}</option>`),
+              ""
+            );
+            $(`#${id}`).append(_html);
+          }
+          $(`.${selectClass}`).selectFilter({
+            callBack: function (val) {
+              //返回选择的值
+              selectFun && selectFun(val);
+              console.log(val + "-是返回的值");
+            },
+          });
+        }
+
+        $(".closeScoreModal").click(function () {
+          closeScoreModal();
+        });
+
+        $(".scoreConfirm").click(function () {
+          let score = $("#modal_score").val().trim();
+          let feedback = $("#modal_evaluate").val().trim();
+          if (!score || !feedback) {
+            $.message({
+              type: "error",
+              content: "The form is not filled out completely!",
+            });
+            return;
+          }
+          post(
+            "/setScore",
+            {
+              id: anserId,
+              score,
+              feedback,
+            },
+            function (res) {
+              $.message({
+                type: "success",
+                content: "Operation successful!",
+              });
+              getList();
+              closeScoreModal();
+            },
+            function (err) {}
+          );
+        });
+
+        function showScoreModal() {
+          $("#scoreModal").fadeIn();
+        }
+        function closeScoreModal() {
+          $("#scoreModal").fadeOut();
+          $("#modal_score").val("");
+          $("#modal_evaluate").val("");
+          anserId = 0;
+        }
+
+        $("#fileInput").on("change", function () {
+          let file = $(this)[0].files[0];
+          console.log("this===", this, file);
+          if (file) {
+            let formData = new FormData();
+            formData.append("file", file);
+            upload("/uploadFile", formData, function (res) {
+              filePath = res && res.data ? res.data.filePath || "" : "";
+              $("#file_name").text(filePath);
+              $("#file_name").attr("href", filePath);
+            });
+          } else {
+            console.log("No file selected.");
+          }
+        });
+      });
+    </script>
+  </body>
+</html>

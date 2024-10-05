@@ -1,0 +1,297 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <!-- Email -->
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="ie=edge" />
+    <meta
+      name="viewport"
+      content="width=device-width, user-scalable=no, initial-scale=1.0"
+    />
+    <link rel="stylesheet" href="../../static/css/reset.css" />
+    <link rel="stylesheet" href="../../static/css/common.css" />
+    <link rel="stylesheet" href="../../static/css/message.css" />
+    <link rel="stylesheet" href="../../static/css/page.css" />
+    <title>Email</title>
+  </head>
+
+  <body>
+    <div class="w100w h100h p_relative box-sizing padding-sm flex-column">
+      <div class="search_form flex align-center">
+        <!-- <div class="flex margin-right-xl">
+          <div class="field both flex align-center">
+            <span>Sender：</span>
+            <div class="filter-box select">
+              <div class="filter-text">
+                <input
+                  class="filter-title"
+                  type="text"
+                  readonly
+                  placeholder="Please select"
+                />
+                <i class="icon icon-filter-arrow"></i>
+              </div>
+              <select id="send-select" name="filter"></select>
+            </div>
+          </div>
+          <div class="field both flex align-center">
+            <span>Recipient：</span>
+            <div class="filter-box select1">
+              <div class="filter-text">
+                <input
+                  class="filter-title"
+                  type="text"
+                  readonly
+                  placeholder="Please select"
+                />
+                <i class="icon icon-filter-arrow"></i>
+              </div>
+              <select id="receive-select" name="filter"></select>
+            </div>
+          </div>
+        </div> -->
+        <div class="flex align-center text-lg">
+          <button id="search" class="def_btn bg-blue">All</button>
+          <button id="receiverSearch" class="def_btn bg-blue">Received</button>
+          <button id="sendSearch" class="def_btn bg-blue">Sent</button>
+          <button id="add" class="def_btn bg-orange">AddEmail</button>
+        </div>
+      </div>
+      <div class="flex1 margin-top-sm">
+        <table class="tableBox">
+          <thead>
+            <tr class="w100 flex align-center">
+              <th class="w10">ID</th>
+              <th class="flex1">SenderUser</th>
+              <th class="flex1">ReceiverUser</th>
+              <th class="flex1">Subject</th>
+              <th class="flex1">Content</th>
+              <th class="flex1">SendTime</th>
+            </tr>
+          </thead>
+          <tbody class="tg-scroll"></tbody>
+        </table>
+      </div>
+
+      <!-- 模态窗 -->
+      <div class="modal">
+        <div class="form">
+          <div class="text-df text-bold">
+            <span class="modal_title">AddEmail</span
+            ><span class="closeModal pointer"> X </span>
+          </div>
+          <hr />
+          <div class="flex flex-column padding-tb padding-lr-sm">
+            <div class="field flex align-center">
+              <span class="field_label">ReceiverUser：</span>
+              <div class="flex1 filter-box select2">
+                <div class="filter-text">
+                  <input
+                    class="filter-title modal_receive flex1"
+                    type="text"
+                    readonly
+                    placeholder="Please select"
+                  />
+                  <i class="icon icon-filter-arrow"></i>
+                </div>
+                <select id="modal-receive-select" name="filter"></select>
+              </div>
+            </div>
+            <div class="field flex align-center margin-top">
+              <span class="field_label">Title：</span>
+              <input
+                id="modal_title"
+                class="field_input flex1"
+                type="text"
+                placeholder="Please enter"
+              />
+            </div>
+            <div class="field flex align-center margin-top">
+              <span class="field_label">Email Content：</span>
+              <textarea
+                id="modal_content"
+                class="field_input"
+                rows="5"
+                placeholder="Please enter"
+              ></textarea>
+            </div>
+          </div>
+          <div class="flex align-center justify-center">
+            <div class="flex">
+              <button class="closeModal def_btn bg-white">Close</button>  
+              <button class="addInfo def_btn bg-blue">Confirm</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <style type="text/css"></style>
+    <script src="../../static/js/jquery.js"></script>
+    <script src="../../static/js/select.js"></script>
+    <script src="../../static/js/request.js"></script>
+    <script src="../../static/js/storage.js"></script>
+    <script src="../../static/js/message.js"></script>
+    <script src="../../static/js/utils.js"></script>
+    <script>
+      $(function () {
+        let logindata = load("logindata") || {};
+        let list = [];
+        let userList = [];
+        let searchData = {
+          userId: logindata.id,
+        };
+        let modalData = {};
+        function getList(otherParams) {
+          let params = {
+            ...searchData,
+            ...(otherParams || {}),
+          };
+          post(
+            "/email",
+            params || {},
+            function (res) {
+              if (res) {
+                list = res.data || [];
+                updateList();
+              }
+            },
+            function (err) {}
+          );
+        }
+        function getUser() {
+          post(
+            "/userList",
+            { userId: logindata.id },
+            function (res) {
+              getList();
+              if (res) {
+                userList = res.data || [];
+                // updateSelect("send-select", "select", (val) => {
+                //   searchData.senderId = val;
+                // });
+                // updateSelect("receive-select", "select1", (val) => {
+                //   searchData.receiverId = val;
+                // });
+              }
+            },
+            function (err) {}
+          );
+        }
+
+        getUser();
+        $("#search").click(function () {
+          getList();
+        });
+        $("#receiverSearch").click(function () {
+          getList({
+            receiverId: logindata.id,
+          });
+        });
+        $("#sendSearch").click(function () {
+          getList({
+            senderId: logindata.id,
+          });
+        });
+        $("#add").click(function () {
+          showModal();
+        });
+        $(".closeModal").click(function () {
+          closeModal();
+        });
+        $(".addInfo").click(function () {
+          let title = $("#modal_title").val().trim();
+          let content = $("#modal_content").val().trim();
+          if (!title || !content) {
+            $.message({
+              type: "error",
+              content: "The form is not filled out completely!",
+            });
+            return;
+          }
+          post(
+            "/addEmail",
+            {
+              subject: title,
+              content,
+              senderId: logindata.id,
+              sendTime: getNow(),
+              ...modalData,
+            },
+            function (res) {
+              $.message({
+                type: "success",
+                content: "Operation successful",
+              });
+              getList();
+              closeModal();
+            },
+            function (err) {}
+          );
+        });
+
+        //渲染列表数据
+        function updateList() {
+          $("tbody").html("");
+          if (list && list.length) {
+            $("tbody").prepend(
+              list.reduce(
+                (t, c) =>
+                  (t += ` <tr class="w100 flex align-center">
+              <td class="w10">${c.id || ""}</td>
+              <td class="flex1">${c.senderUser || ""}</td>
+              <td class="flex1">${c.receiverUser || ""}</td>
+              <td class="flex1">${c.subject || ""}</td>
+              <td class="flex1">${c.content || ""}</td>
+              <td class="flex1">${c.sendTime || ""}</td>
+      </tr>`),
+                ""
+              )
+            );
+          }
+        }
+
+        function updateSelect(id, selectClass, selectFun, needAll = true) {
+          $(`#${id}`).html("");
+          if (needAll) {
+            $(`#${id}`).append("<option selected value=''>All</option>");
+          }
+          if (userList && userList.length) {
+            const _html = userList.reduce(
+              (t, c) => (t += `<option value=${c.id}>${c.username}</option>`),
+              ""
+            );
+            $(`#${id}`).append(_html);
+          }
+          $(`.${selectClass}`).selectFilter({
+            callBack: function (val) {
+              //返回选择的值
+              selectFun && selectFun(val);
+              console.log(val + "-是返回的值");
+            },
+          });
+        }
+
+        function showModal() {
+          $(".modal").fadeIn();
+          if (!$("#modal-receive-select").children().length) {
+            updateSelect(
+              "modal-receive-select",
+              "select2",
+              (val) => {
+                modalData.receiverId = val;
+              },
+              false
+            );
+          }
+        }
+        function closeModal() {
+          $(".modal").fadeOut();
+          $("#modal_title").val("");
+          $("#modal_content").val("");
+          $("#modal_receive").val("");
+        }
+      });
+    </script>
+  </body>
+</html>

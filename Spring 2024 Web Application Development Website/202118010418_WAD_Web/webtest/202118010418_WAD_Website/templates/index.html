@@ -1,0 +1,889 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="ie=edge" />
+    <meta
+      name="viewport"
+      content="width=device-width, user-scalable=no, initial-scale=1.0"
+    />
+    <link rel="stylesheet" href="../static/css/reset.css" />
+    <link rel="stylesheet" href="../static/css/common.css" />
+    <link rel="stylesheet" href="../static/css/message.css" />
+    <link rel="stylesheet" href="../static/css/index.css" />
+    <title>ManagementSystem</title>
+  </head>
+
+  <body>
+    <div class="w100w h100h flex-column p_relative bg-white">
+      <header class="headerBox text-white solid-bottom">
+        <img
+          class="logo_img"
+          src="https://www.naiveui.com/assets/naivelogo-BdDVTUmz.svg"
+        />
+        <h1 class="logo">ManagementSystem</h1>
+        <div class="baseBox flex1">
+          <!-- <div class="opreateBox flex align-center margin-right-xl">
+            <div class="tabpane pointer">
+              <a id="updatePassword">ChangePassword</a>
+            </div>
+            <div class="tabpane pointer">
+              <a id="updateAnnouncement">ModifyAnnouncement</a>
+            </div>
+          </div> -->
+          <div class="notice p_relative">
+            <img class="w100 h100" src="../static/images/gg.png" />
+            <div class="tip_circle p_relative bg-green tg-circle-sm"></div>
+          </div>
+          <div class="headMenu pointer flex align-center p_relative">
+            <div class="avatar">
+              <img
+                class="user_icon"
+                src="https://ts2.cn.mm.bing.net/th?id=OIP-C.jHUH4s7TQ48X_B-1iozuJgHaHa&w=250&h=250&c=8&rs=1&qlt=90&o=6&pid=3.1&rm=2"
+              />
+            </div>
+            <span id="userName" class="text-bold text-df margin-lr"
+              >Hello XXX</span
+            >
+            <ul id="menu" class="p_absolute" style="display: none"></ul>
+          </div>
+          <!-- <a class="logout pointer text-red" href="javascript:;">logout </a> -->
+        </div>
+      </header>
+
+      <main class="container flex1 over_hide flex">
+        <div class="menuBox">
+          <div class="list">
+            <ul id="menuList" class="menu_card"></ul>
+
+            <div id="deadlineListMain" class="menu_card margin-top">
+              <div
+                class="solid-bottom padding-tb-sm text-df text-bold text-left"
+              >
+                Assignment Deadline
+              </div>
+
+              <ul id="deadlineList">
+                <!-- <li class="flex align-center">
+                  <div class="tg-circle-sm bg-black"></div>
+                  <a class="text-grey text-sm">
+                    2024-05-15 12:30 安全基础论文
+                  </a>
+                </li> -->
+              </ul>
+            </div>
+
+            <div class="menu_card margin-top">
+              <div
+                class="solid-bottom padding-tb-sm text-df text-bold text-left"
+              >
+                Notifications
+              </div>
+              <p
+                id="notifications"
+                class="text-red text-sm text-bold margin-tb pointer"
+              ></p>
+              <ul id="noticeList"></ul>
+            </div>
+
+            <!-- <div class="margin-top">
+              <img class="w100" src="http://zhenglinglu.cn/img/tx.gif" />
+            </div> -->
+          </div>
+        </div>
+        <div class="contentBox radius flex1">
+          <iframe src="" class="iframeBox w100 h100" name="iframeBox"></iframe>
+        </div>
+      </main>
+
+      <div class="w100 padding-tb bg-black text-center text-sm">
+        Chengdu ICP backup number xxxxxxxxxxxx -1 Chengdu Public Network
+        Security backup number xxxxxxxxxxxx
+        <br />
+        2012-2024 xxxx.com xxxx All rights reserved
+      </div>
+
+      <!-- <div class="floating_ball pointer">
+      </div> -->
+
+      <!-- 公告展示 -->
+      <div class="modal show_announcement">
+        <div class="form">
+          <div class="text-df text-bold text-center">
+            <span class="modal_title text-center">Announcement</span
+            ><span class="closeModal pointer"> X </span>
+          </div>
+          <hr />
+          <div class="flex flex-column padding-tb padding-lr-sm">
+            <span id="announcement_title" class="text-center text-bold"></span>
+            <div id="announcement_content" class="margin-tb"></div>
+          </div>
+          <div class="closeModal margin-top def_btn bg-blue">Ok</div>
+        </div>
+      </div>
+
+      <!-- ChangePassword -->
+      <!-- <div id="updatePasswordModal" class="modal">
+        <div class="form">
+          <div class="text-df text-bold text-center">
+            <span class="modal_title text-center">ChangePassword</span
+            ><span class="closeModal pointer"> X </span>
+          </div>
+          <hr />
+          <div class="flex flex-column padding-tb padding-lr-sm">
+            <div class="field flex align-center">
+              <span class="field_label">New password：</span>
+              <input
+                id="modal_password"
+                class="field_input flex1"
+                type="text"
+                placeholder="Please enter"
+              />
+            </div>
+          </div>
+          <div class="flex align-center justify-center">
+            <div class="flex">
+              <button class="closeModal def_btn bg-white">Close</button>  
+              <button class="updatePasswordConfirm def_btn bg-blue">
+                Confirm
+              </button>
+            </div>
+          </div>
+        </div>
+      </div> -->
+
+      <!-- ModifyAnnouncement -->
+      <div id="updateAnnouncementModal" class="modal">
+        <div class="form">
+          <div class="text-df text-bold text-center">
+            <span class="modal_title text-center">ModifyAnnouncement</span
+            ><span class="closeModal pointer"> X </span>
+          </div>
+          <hr />
+          <div class="flex flex-column padding-tb padding-lr-sm">
+            <!-- <div class="field flex align-center">
+              <span class="field_label">Title：</span>
+              <input
+                id="modal_announcement_title"
+                class="field_input flex1"
+                type="text"
+                placeholder="Please enter"
+              />
+            </div> -->
+            <div class="field flex align-center margin-top">
+              <span class="field_label">Content：</span>
+              <textarea
+                id="modal_announcement_content"
+                class="field_input"
+                rows="5"
+                placeholder="Please enter"
+              ></textarea>
+            </div>
+          </div>
+          <div class="flex align-center justify-center">
+            <div class="flex">
+              <button class="closeModal def_btn bg-white">Close</button>  
+              <button class="updateAnnouncementConfirm def_btn bg-blue">
+                Confirm
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div id="modifyInformationModal" class="modal">
+        <div class="form">
+          <div class="text-df text-bold text-center">
+            <span class="modal_title text-center">ModifyInformation</span
+            ><span class="closeModal pointer"> X </span>
+          </div>
+          <hr />
+          <div class="flex flex-column padding-tb padding-lr-sm">
+            <div class="field flex align-center margin-bottom">
+              <span class="field_label">UserName：</span>
+              <input
+                id="modal_username"
+                class="field_input flex1"
+                type="text"
+                placeholder="Please enter"
+              />
+            </div>
+            <div class="field flex align-center margin-bottom">
+              <span class="field_label">NewPassword：</span>
+              <input
+                id="modal_password"
+                class="field_input flex1"
+                type="text"
+                placeholder="Please enter"
+              />
+            </div>
+            <div class="field flex align-center margin-bottom">
+              <span class="field_label">Age：</span>
+              <input
+                id="modal_age"
+                class="field_input flex1"
+                type="text"
+                placeholder="Please enter"
+              />
+            </div>
+            <div class="field flex align-center">
+              <span class="field_label">Sex：</span>
+              <div class="flex1 filter-box select1">
+                <div class="filter-text">
+                  <input
+                    class="filter-title modal-filter-sex"
+                    type="text"
+                    readonly
+                    placeholder="Please select"
+                  />
+                  <i class="icon icon-filter-arrow"></i>
+                </div>
+                <select name="filter">
+                  <option value="boy">Male</option>
+                  <option value="girl">FeMale</option>
+                </select>
+              </div>
+            </div>
+          </div>
+          <div class="flex align-center justify-center">
+            <div class="flex">
+              <button class="closeModal def_btn bg-white">Close</button>  
+              <button class="updateInformationConfirm def_btn bg-blue">
+                Confirm
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- 回复信息模态框 -->
+      <div id="answerModal" class="modal">
+        <div class="form">
+          <div class="text-df text-bold">
+            <span class="modal_title">Feedback And Grdes</span
+            ><span class="closeAnswerModal pointer"> X </span>
+          </div>
+          <hr />
+          <div class="flex flex-column padding-tb padding-lr-sm">
+            <div class="field flex align-center">
+              <span class="field_label">Reply Content：</span>
+              <textarea
+                id="modal_content"
+                class="field_input"
+                rows="5"
+                placeholder="Please enter"
+              ></textarea>
+            </div>
+            <div class="p_relative margin-top">
+              <button class="w100 def_btn bg-white">UploadFile</button>  
+              <input
+                class="p_absolute"
+                id="fileInput"
+                style="opacity: 0; margin-bottom: 0; left: 0; top: 0"
+                type="file"
+              />
+            </div>
+            <a id="file_name" href="" target="_blank"></a>
+          </div>
+          <div class="flex align-center justify-center">
+            <div class="flex">
+              <button class="closeAnswerModal def_btn bg-white">Close</button>  
+              <button class="answerConfirm def_btn bg-blue">Confirm</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <style type="text/css"></style>
+    <script src="../static/js/jquery.js"></script>
+    <script src="../static/js/request.js"></script>
+    <script src="../static/js/select.js"></script>
+    <script src="../static/js/storage.js"></script>
+    <script src="../static/js/message.js"></script>
+    <script src="../static/js/utils.js"></script>
+    <script>
+      $(function () {
+        let logindata = load("logindata") || {};
+        let selectIndex = 0;
+        let announcement = {};
+        let $navBoxList;
+        let filePath = "";
+        let jobId;
+        let deadLineList = [];
+        let menuMap = new Map();
+        let $headMenu = $(".headMenu");
+        let $menu = $("#menu");
+        $headMenu.mouseenter(function () {
+          console.log("1231313");
+          $menu.fadeIn();
+        });
+        $headMenu.mouseleave(function () {
+          //获取菜单栏的坐标值
+          let menux = menu.offsetLeft;
+          let menuy = menu.offsetTop;
+          let menuX = menu.offsetLeft + menu.offsetWidth;
+          let menuY = menu.offsetTop + menu.offsetHeight;
+
+          //获取鼠标的坐标值
+          let event = window.event;
+          let mouseX = event.clientX;
+          let mouseY = event.clientY;
+
+          if (
+            mouseX < menux ||
+            mouseX > menuX ||
+            mouseY < menuY ||
+            mouseY > menuY
+          ) {
+            $menu.fadeOut();
+          }
+        });
+        console.log("logindata", logindata);
+        let roleModule = [
+          {
+            name: "SystemManagement",
+            children: [
+              {
+                name: "UserManagement",
+                path: "/user",
+                roleKey: ["Admin"],
+              },
+            ],
+          },
+          {
+            name: "BasicManagement",
+            children: [
+              // {
+              //   name: "CoursewareManagement",
+              //   path: "/courseware_management",
+              //   roleKey: ["Instructor", "Student"],
+              // },
+              {
+                name: "LectureManagement",
+                path: "/lecture_management",
+              },
+              // {
+              //   name: "SubjectManagement",
+              //   path: "/subjectManagement",
+              //   roleKey: ["Admin"],
+              // },
+              {
+                name: "CourseManagement",
+                path: "/courseManagement",
+              },
+              // {
+              //   name: "SelectedCourses",
+              //   path: "/selectedCourses",
+              //   roleKey: ["Student"],
+              // },
+              {
+                name: "JobManagement",
+                path: "/jobManagement",
+                roleKey: ["Instructor", "Student"],
+              },
+              {
+                name: "FeedbackAndGrdes",
+                path: "/homeworkReply",
+                roleKey: ["Instructor", "Student"],
+              },
+            ],
+          },
+          {
+            name: "Other",
+            children: [
+              {
+                name: "Email",
+                path: "/email",
+              },
+              {
+                name: "Forum",
+                path: "/forum",
+              },
+            ],
+          },
+        ];
+
+        function init() {
+          if (logindata.username) {
+            $("#userName").text(`Hello ${logindata.username}`);
+          }
+          // if (logindata.type == "Admin") {
+          //   $("#updateAnnouncement").parent().show();
+          // } else {
+          //   $("#updateAnnouncement").parent().hide();
+          // }
+
+          // <li>
+          //       <img
+          //         class="menu_icon"
+          //         src="../static//images/xiugaimima.png"
+          //       /><a id="updatePassword">ChangePassword</a>
+          //     </li>
+          $("#menu").html("");
+          $("#menu").append(
+            `${
+              logindata.type == "Admin"
+                ? `<li>
+                <img class="menu_icon" src="../static//images/xiugai.png" /><a
+                  id="updateAnnouncement"
+                  >ModifyAnnouncement</a
+                >
+              </li>`
+                : ""
+            }
+            <li>
+                <img class="menu_icon" src="../static//images/xiugai.png" /><a
+                  id="modifyInformation"
+                  >ModifyInformation</a
+                >
+              </li>
+            
+              <li>
+                <img class="menu_icon" src="../static//images/tuichu.png" />
+                <a class="logout pointer" href="javascript:;">Logout </a>
+              </li>`
+          );
+          $("#menuList").html("");
+
+          $("#menuList").append(
+            roleModule.reduce(
+              (t, c) => {
+                t +=
+                  c.roleKey && !c.roleKey.includes(logindata.type)
+                    ? ""
+                    : `
+                       ${c.children.reduce((r, i, x) => {
+                         if (i.name === "JobManagement") {
+                           i.name = `${
+                             logindata.identity == 1
+                               ? "Assignment"
+                               : "Submission"
+                           }Management`;
+                         }
+                         menuMap.set(i.name, x);
+                         r +=
+                           !i.roleKey || i.roleKey.includes(logindata.type)
+                             ? `<li ><div class="tg-circle-sm bg-black "></div><a href="${
+                                 i.path
+                               }" target="iframeBox">${i.name || ""}</a></li>`
+                             : "";
+                         return r;
+                       }, "")}
+                     `;
+                return t;
+              },
+              `<div
+                class=" solid-bottom padding-tb-sm text-black text-df text-bold text-left"
+              >
+              System Menu
+              </div>`
+            )
+          );
+          $navBoxList = $("#menuList a:not(.inactive)");
+
+          $("#fileInput").on("change", function () {
+            let file = $(this)[0].files[0];
+            console.log("this===", this, file);
+            if (file) {
+              let formData = new FormData();
+              formData.append("file", file);
+              upload("/uploadFile", formData, function (res) {
+                filePath = res && res.data ? res.data.filePath || "" : "";
+                $("#file_name").text(filePath);
+                $("#file_name").attr("href", filePath);
+              });
+            } else {
+              console.log("No file selected.");
+            }
+          });
+          $(".closeAnswerModal").click(function () {
+            closeAnswerModal();
+          });
+          $(".answerConfirm").click(function () {
+            let content = $("#modal_content").val().trim();
+            if (!content || !filePath) {
+              $.message({
+                type: "error",
+                content: "The form is not filled out completely!",
+              });
+              return;
+            }
+            post(
+              "/addAnswer",
+              {
+                homeworkId: jobId,
+                userId: logindata.id,
+                content,
+                filePath,
+                addTime: getNow(),
+              },
+              function (res) {
+                $.message({
+                  type: "success",
+                  content: "Operation successful!",
+                });
+                getDeadlineList();
+                closeAnswerModal();
+              },
+              function (err) {}
+            );
+          });
+
+          // var colors = new Array(
+          //   // [62, 35, 255],
+          //   // [60, 255, 60],
+          //   // [255, 35, 98],
+          //   // [45, 175, 230],
+          //   // [255, 0, 255],
+          //   // [255, 128, 0]
+          //   [120, 207, 246],
+          //   [124, 172, 247],
+          //   [128, 138, 248],
+          //   [157, 132, 249],
+          //   [195, 137, 250],
+          //   [168, 238, 237]
+          // );
+
+          // var step = 0;
+          // var colorIndices = [0, 1, 2, 3];
+          // var gradientSpeed = 0.002;
+
+          // function updateGradient() {
+          //   if ($ === undefined) return;
+
+          //   var c0_0 = colors[colorIndices[0]];
+          //   var c0_1 = colors[colorIndices[1]];
+          //   var c1_0 = colors[colorIndices[2]];
+          //   var c1_1 = colors[colorIndices[3]];
+
+          //   var istep = 1 - step;
+          //   var r1 = Math.round(istep * c0_0[0] + step * c0_1[0]);
+          //   var g1 = Math.round(istep * c0_0[1] + step * c0_1[1]);
+          //   var b1 = Math.round(istep * c0_0[2] + step * c0_1[2]);
+          //   var color1 = "rgb(" + r1 + "," + g1 + "," + b1 + ")";
+
+          //   var r2 = Math.round(istep * c1_0[0] + step * c1_1[0]);
+          //   var g2 = Math.round(istep * c1_0[1] + step * c1_1[1]);
+          //   var b2 = Math.round(istep * c1_0[2] + step * c1_1[2]);
+          //   var color2 = "rgb(" + r2 + "," + g2 + "," + b2 + ")";
+
+          //   $(".headerBox")
+          //     .css({
+          //       background:
+          //         "-webkit-gradient(linear, left top, right top, from(" +
+          //         color1 +
+          //         "), to(" +
+          //         color2 +
+          //         "))",
+          //     })
+          //     .css({
+          //       background:
+          //         "-moz-linear-gradient(left, " +
+          //         color1 +
+          //         " 0%, " +
+          //         color2 +
+          //         " 100%)",
+          //     });
+
+          //   step += gradientSpeed;
+          //   if (step >= 1) {
+          //     step %= 1;
+          //     colorIndices[0] = colorIndices[1];
+          //     colorIndices[2] = colorIndices[3];
+
+          //     //pick two new target color indices
+          //     //do not pick the same as the current one
+          //     colorIndices[1] =
+          //       (colorIndices[1] +
+          //         Math.floor(1 + Math.random() * (colors.length - 1))) %
+          //       colors.length;
+          //     colorIndices[3] =
+          //       (colorIndices[3] +
+          //         Math.floor(1 + Math.random() * (colors.length - 1))) %
+          //       colors.length;
+          //   }
+          // }
+
+          // setInterval(updateGradient, 10);
+          getDeadlineList();
+
+          window.addEventListener(
+            "message",
+            function (e) {
+              if (e.data && typeof e.data == "string") {
+                const params = JSON.parse(e.data);
+                console.log(params);
+                setActive(menuMap.get(params.name) || 0);
+                setTimeout(() => {
+                  $(".iframeBox")[0].contentWindow.updateParams &&
+                    $(".iframeBox")[0].contentWindow.updateParams(params);
+                }, 100);
+              }
+            },
+            false
+          );
+        }
+        init();
+
+        function getDeadlineList() {
+          post(
+            "/homework",
+            {
+              studentId: logindata.id,
+              endTimeFlag: 1,
+            },
+            function (res) {
+              deadLineList = res.data || [];
+              updateDeadlineList(res.data);
+              getAnnouncement();
+            },
+            function (err) {}
+          );
+        }
+
+        function updateDeadlineList(list) {
+          $("#deadlineList").html("");
+          if (list && list.length) {
+            list.forEach((element) => {
+              $("#deadlineList").append(
+                `<li id="dead_line_item" job_id="${element.id}" class="flex align-center">
+                  <div class="tg-circle-sm bg-black"></div>
+                  <a class="text-grey text-sm">
+                    ${element.endTime} ${element.name}
+                  </a>
+                </li>`
+              );
+            });
+          }
+        }
+
+        function getAnnouncement() {
+          post("/news", {}, function (res) {
+            announcement = res || {};
+            $("#notifications").html("");
+            $("#notifications").text(announcement.data || "");
+            if (logindata.identity === 2) {
+              $("#deadlineListMain").show();
+              $("#noticeList").html("");
+              if (deadLineList && deadLineList.length) {
+                $("#noticeList").append(`<div
+                class=" text-grey padding-tb-sm text-sm text-bold text-left field_item"
+              >
+              The following assignments are about to exceed the deadline!
+              </div>`);
+                deadLineList.forEach((element) => {
+                  $("#noticeList").append(
+                    `<li class="flex align-center field_item">
+                  <div class="tg-circle-sm bg-black"></div>
+                  <a class="text-red text-sm">
+                    ${element.endTime} ${element.name}
+                  </a>
+                </li>`
+                  );
+                });
+              }
+              return;
+            }
+            $("#deadlineListMain").hide();
+          });
+        }
+
+        $navBoxList.each(function (index) {
+          if (index === selectIndex) {
+            $(this).click();
+            $(this).addClass("active");
+            $(".iframeBox").attr("src", $(this).attr("href"));
+          }
+          $(this).attr("index", index);
+        });
+
+        function setActive(index) {
+          $navBoxList.get(selectIndex).setAttribute("class", "");
+          $navBoxList.get(index).setAttribute("class", "active");
+          $navBoxList.get(index).click();
+          selectIndex = index;
+        }
+        $navBoxList.click(function (e) {
+          let index = $(this).attr("index");
+          setActive(index);
+        });
+
+        $(".inactive").click(function () {
+          if ($(this).siblings("ul").css("display") == "none") {
+            $(this).addClass("inactives");
+            $(this).siblings("ul").slideDown(200).children("li");
+          } else {
+            $(this).removeClass("inactives");
+            $(this).siblings("ul").slideUp(200);
+          }
+        });
+        $("#menu").on(
+          "click",
+          "#updatePassword,#updateAnnouncement,#modifyInformation",
+          function (e) {
+            if (e.target.id === "updatePassword") {
+              showPasswordModal();
+            }
+            if (e.target.id === "updateAnnouncement") {
+              showAnnouncementModal();
+            }
+            if (e.target.id === "modifyInformation") {
+              showInformationModal();
+            }
+          }
+        );
+        $("#deadlineList").on("click", "li", function (e) {
+          jobId = ~~$(this).attr("job_id");
+          console.log("12313", $(this), jobId);
+          if (jobId) {
+            showAnswerModal();
+          }
+        });
+        $("#notifications").click(function () {
+          showModal();
+        });
+
+        $(".logout").click(function () {
+          jump("/login_page");
+        });
+        $(".notice").click(function () {
+          showModal();
+        });
+        $(".closeModal").click(function () {
+          closeModal();
+          closePasswordModal();
+          closeAnnouncementModal();
+          closeInformationModal();
+        });
+        $(".updatePasswordConfirm").click(function () {
+          let password = $("#modal_password").val();
+          let params = {
+            id: logindata.id,
+            password,
+          };
+          post(
+            "/modifyPassword",
+            params || {},
+            function (res) {
+              $.message({
+                type: "success",
+                content: "Password modification successful!",
+              });
+              closePasswordModal();
+            },
+            function (err) {}
+          );
+        });
+        $(".updateAnnouncementConfirm").click(function () {
+          let content = $("#modal_announcement_content").val();
+          let params = {
+            content,
+          };
+          post(
+            "/updateNews",
+            params || {},
+            function (res) {
+              announcement = { data: content || "" };
+              $("#notifications").text(content || "");
+              $.message({
+                type: "success",
+                content: "Announcement modification successful!",
+              });
+              closeAnnouncementModal();
+            },
+            function (err) {}
+          );
+        });
+        $(".updateInformationConfirm").click(function () {
+          let username = $("#modal_username").val().trim();
+          let password = $("#modal_password").val().trim();
+          let age = $("#modal_age").val().trim();
+          let sex = $(".modal-filter-sex").val();
+          if (!username || !password || !age || !sex) {
+            $.message({
+              type: "error",
+              content: "The form is not filled out completely!",
+            });
+            return;
+          }
+          post(
+            "/addOrUpdateUser",
+            {
+              id: logindata.id,
+              username,
+              password,
+              age,
+              sex,
+            },
+            function (res) {
+              logindata = res.message || {};
+              save("logindata", Object.assign(logindata, res.message || {}));
+              closeInformationModal();
+            },
+            function (err) {
+              if (err && err.code == -1) {
+                $.message({
+                  type: "error",
+                  content: "User already exists！",
+                });
+              }
+            }
+          );
+        });
+
+        $(".select1").selectFilter({
+          callBack: function (val) {
+            //返回选择的值
+            console.log(val + "-是返回的值");
+          },
+        });
+
+        function showModal() {
+          $(".show_announcement").fadeIn();
+          $("#announcement_content").text(announcement.data || "");
+        }
+        function closeModal() {
+          $(".show_announcement").fadeOut();
+        }
+
+        function showPasswordModal() {
+          $("#updatePasswordModal").fadeIn();
+        }
+        function closePasswordModal() {
+          $("#updatePasswordModal").fadeOut();
+          $("#modal_password").val("");
+        }
+
+        function showAnnouncementModal() {
+          $("#updateAnnouncementModal").fadeIn();
+          $("#modal_announcement_content").val(announcement.data || "");
+        }
+        function closeAnnouncementModal() {
+          $("#updateAnnouncementModal").fadeOut();
+        }
+        function showInformationModal() {
+          $("#modifyInformationModal").fadeIn();
+          $("#modal_username").val(logindata.username || "");
+          $("#modal_password").val("");
+          $("#modal_age").val(logindata.age || "");
+          $(".modal-filter-sex").val(logindata.sex || "");
+        }
+        function closeInformationModal() {
+          $("#modifyInformationModal").fadeOut();
+        }
+
+        function showAnswerModal() {
+          $("#answerModal").fadeIn();
+        }
+        function closeAnswerModal() {
+          $("#answerModal").fadeOut();
+          $("#modal_content").val("");
+          $("#file_name").text("");
+          filePath = "";
+          jobId = 0;
+        }
+      });
+    </script>
+  </body>
+</html>

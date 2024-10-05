@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <!-- 已选择课程 -->
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="ie=edge" />
+    <meta
+      name="viewport"
+      content="width=device-width, user-scalable=no, initial-scale=1.0"
+    />
+    <link rel="stylesheet" href="../../static/css/reset.css" />
+    <link rel="stylesheet" href="../../static/css/common.css" />
+    <link rel="stylesheet" href="../../static/css/message.css" />
+    <link rel="stylesheet" href="../../static/css/page.css" />
+    <title>selectedCourses</title>
+  </head>
+
+  <body>
+    <div class="w100w h100h p_relative box-sizing padding-sm flex-column">
+      <div class="search_form flex align-center">
+        <div class="flex align-center text-lg">
+          <button id="search" class="def_btn bg-blue">Search</button>
+        </div>
+      </div>
+      <div class="flex1 margin-top-sm">
+        <table class="tableBox">
+          <thead>
+            <tr class="w100 flex align-center">
+              <th class="w10">ID</th>
+              <th class="flex1">TeacherName</th>
+              <th class="flex1">Subject</th>
+              <th class="flex1">Description</th>
+              <th class="flex1">StartTime</th>
+              <th class="flex1">EndTime</th>
+            </tr>
+          </thead>
+          <tbody class="tg-scroll"></tbody>
+        </table>
+      </div>
+    </div>
+
+    <style type="text/css"></style>
+    <script src="../../static/js/jquery.js"></script>
+    <script src="../../static/js/select.js"></script>
+    <script src="../../static/js/request.js"></script>
+    <script src="../../static/js/storage.js"></script>
+    <script src="../../static/js/message.js"></script>
+    <script src="../../static/js/utils.js"></script>
+    <script>
+      $(function () {
+        let logindata = load("logindata") || {};
+        let list = [];
+        let userList = [];
+        let jobList = [];
+        let searchData = {
+          userId: logindata.id,
+        };
+        function getList() {
+          let params = {
+            ...searchData,
+          };
+          post(
+            "/getMyCourse",
+            params || {},
+            function (res) {
+              if (res) {
+                list = res.data || [];
+                updateList();
+              }
+            },
+            function (err) {}
+          );
+        }
+
+        getList();
+        $("#search").click(function () {
+          getList();
+        });
+
+        //渲染列表数据
+        function updateList() {
+          $("tbody").html("");
+          if (list && list.length) {
+            $("tbody").prepend(
+              list.reduce(
+                (t, c) =>
+                  (t += ` <tr class="w100 flex align-center">
+                <td class="w10">${c.id || ""}</td>
+                <td class="flex1">${c.teacherName || ""}</td>
+                <td class="flex1">${c.subject || ""}</td>
+                <td class="flex1">${c.description || ""}</td>
+                <td class="flex1">${c.startTime || ""}</td>
+                <td class="flex1">${c.endTime || ""}</td>
+        </tr>`),
+                ""
+              )
+            );
+          }
+        }
+      });
+    </script>
+  </body>
+</html>

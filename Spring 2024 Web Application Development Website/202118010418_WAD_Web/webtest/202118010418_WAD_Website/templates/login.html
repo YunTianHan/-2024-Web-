@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>ManagementSystem</title>
+    <link rel="stylesheet" href="../static/css/reset.css" />
+    <link rel="stylesheet" href="../static/css/common.css" />
+    <link rel="stylesheet" href="../static/css/message.css" />
+    <link rel="stylesheet" href="../static/css/login.css" />
+    <link rel="stylesheet" href="../static/iconfont/iconfont.css" />
+  </head>
+  <body>
+    <div class="container flex-column justify-center align-center">
+      <div
+        class="w100 bg-red padding-tb text-xxl text-white text-bold text-center"
+      >
+        Welcome to our system， please verify your identity
+      </div>
+      <div class="login_main flex1">
+        <div class="login flex-column">
+          <h1 class="title">Welcome To Login</h1>
+          <div class="field_label">UserName<span class="text-red">*</span></div>
+          <div class="form">
+            <i class="iconfont icon-yonghuming"></i>
+            <input
+              type="text"
+              class="username"
+              placeholder="Please enter username"
+            />
+          </div>
+          <div class="field_label">Password<span class="text-red">*</span></div>
+          <div class="form">
+            <i class="iconfont icon-mima"></i>
+            <input
+              type="password"
+              class="password"
+              placeholder="Please enter password"
+            />
+          </div>
+          <button class="submit select_btn">login</button>
+        </div>
+      </div>
+      <div class="w100 padding-tb bg-black text-center text-sm">
+        Chengdu ICP backup number xxxxxxxxxxxx -1 Chengdu Public Network
+        Security backup number xxxxxxxxxxxx
+        <br />
+        2012-2024 xxxx.com xxxx All rights reserved
+      </div>
+    </div>
+    <style type="text/css"></style>
+    <script src="../static/js/jquery.js"></script>
+    <script src="../static/js/request.js"></script>
+    <script src="../static/js/storage.js"></script>
+    <script src="../static/js/message.js"></script>
+    <script src="../static/js/utils.js"></script>
+    <script>
+      $(function () {
+        function reset() {
+          $(".username").val("");
+          $(".password").val("");
+        }
+        $(".submit").click(function (e) {
+          let username = $(".username").val().trim();
+          let password = $(".password").val().trim();
+
+          if (!username || !password) {
+            $.message({
+              type: "error",
+              content: "username or password cannot be empty！",
+            });
+            return;
+          }
+          post(
+            "/login",
+            { username, password },
+            function (res) {
+              console.log("res ===", res);
+              if (res) {
+                const data = res.data || {};
+                const typeObj = {
+                  0: "Admin",
+                  1: "Instructor",
+                  2: "Student",
+                };
+                data.typeObj = typeObj;
+                data.type = typeObj[data.identity];
+                save("logindata", res.data || {});
+              }
+              reset();
+              jump("/index");
+            },
+            function (err) {
+              reset();
+              if (err && err.status === 400) {
+                $.message({
+                  type: "error",
+                  content: "Account password error！",
+                });
+              }
+            }
+          );
+        });
+      });
+    </script>
+  </body>
+</html>

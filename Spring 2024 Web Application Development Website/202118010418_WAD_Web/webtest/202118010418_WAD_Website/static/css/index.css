@@ -1,0 +1,221 @@
+.container {
+  background-color: #fff;
+  overflow-y: auto;
+}
+
+.headerBox {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  height: 52px;
+  background: var(--red);
+  /* background: linear-gradient(to right, #25c481, #25b7c4); */
+  /* border-bottom: 1px solid #606266; */
+  box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.03),
+    0 1px 6px -1px rgba(0, 0, 0, 0.02), 0 2px 4px 0 rgba(0, 0, 0, 0.02);
+  /* overflow: hidden; */
+}
+
+.logo_img {
+  width: 30px;
+  height: 30px;
+  margin: 0 14px 0 21px;
+}
+
+.headerBox .logo {
+  line-height: 52px;
+  text-align: center;
+  font-size: 20px;
+  /* color: #fff; */
+  letter-spacing: 3px;
+}
+
+.headerBox .baseBox {
+  display: flex;
+  justify-content: end;
+  align-items: center;
+  box-sizing: border-box;
+  padding-right: 10px;
+  /* width: 18%; */
+  line-height: 52px;
+  text-align: right;
+  font-size: 16px;
+}
+
+.notice {
+  width: 22px;
+  height: 22px;
+  padding: 6px;
+  border-radius: 6px;
+  display: flex;
+  margin-right: 20px;
+  cursor: pointer;
+  transition: background 0.3s ease;
+}
+
+.notice:hover {
+  background-color: rgba(0, 0, 0, 0.2);
+}
+
+.menu_card {
+  box-sizing: border-box;
+  border: 1px solid rgba(0, 0, 0, 0.1);
+  background-color: var(--menuBackground);
+  padding-left: 25px;
+  padding-right: 25px;
+}
+
+#menuList {
+}
+
+#menu {
+  /* width: 100%; */
+  top: 52px;
+  border-radius: 6px;
+  background-color: #fff;
+  box-shadow: 0 6px 16px -8px #00000014, 0 9px 28px #0000000d,
+    0 12px 48px 16px #00000008;
+  text-align: center;
+  transform: translateX(-20%);
+}
+#menu li {
+  line-height: 1;
+  padding: 10px 6px;
+  margin: 6px 10px;
+  border-radius: 6px;
+  transition: background 0.3s ease;
+  display: flex;
+  align-items: center;
+}
+#menu li a {
+  color: var(--black);
+}
+
+#menu li:hover {
+  background-color: #f2f2f2;
+  cursor: pointer;
+}
+
+.avatar {
+  width: 30px;
+  height: 30px;
+  border-radius: 50%;
+  display: flex;
+}
+.avatar .user_icon {
+  width: 100%;
+  height: 100%;
+  background-image: url("https://ts2.cn.mm.bing.net/th?id=OIP-C.jHUH4s7TQ48X_B-1iozuJgHaHa&w=250&h=250&c=8&rs=1&qlt=90&o=6&pid=3.1&rm=2");
+}
+
+.contentBox {
+  border-color: rgba(5, 5, 5, 0.1);
+  /* box-shadow: 0 6px 16px -8px #00000014, 0 9px 28px #0000000d,
+    0 12px 48px 16px #00000008; */
+}
+
+.menu_icon {
+  width: 18px;
+  height: 18px;
+  margin: 0 8px;
+}
+
+/* 标签栏 */
+.tabpane {
+}
+
+.tabpane a {
+  /* color: #fff; */
+  padding: 8px 12px;
+  border-radius: 6px;
+  transition: all 0.3s ease;
+}
+.tabpane a:hover {
+  /* color: #fff; */
+  background-color: #f2f2f2;
+}
+
+/*悬浮球*/
+.tip_circle {
+  position: absolute;
+  left: 75%;
+}
+.floating_ball {
+  width: 50px;
+  height: 50px;
+  position: fixed;
+  bottom: 40px;
+  right: 40px;
+  border-radius: 50%;
+  border: var(--borderColor);
+  box-shadow: 0 6px 16px 0 rgba(0, 0, 0, 0.08),
+    0 3px 6px -4px rgba(0, 0, 0, 0.12), 0 9px 28px 8px rgba(0, 0, 0, 0.05);
+  background: url("../images/announcement.png") no-repeat center;
+  background-size: 60% 60%;
+  transition: all 0.3s ease;
+}
+
+.floating_ball:hover {
+  transform: scale(1.1);
+  background-color: #f5f5f5;
+}
+
+#notifications {
+  line-height: 1.8;
+  letter-spacing: 1.5px;
+  text-indent: 2em;
+}
+
+/*
+* 导航栏样式
+*/
+.list {
+  width: 280px;
+  /* height: 100%; */
+  /* border-bottom: solid 1px #316a91; */
+  /* margin-right: auto;
+  margin-left: auto; */
+  /* padding-left: 10px;
+  padding-right: 10px;
+  padding-top: 10px; */
+  /* background-color: var(--white); */
+  margin: 20px 20px 0 40px;
+  padding-bottom: 15px;
+  box-shadow: 1px 0 2px 0 rgba(0, 0, 0, 0.03),
+    1px 0 6px -1px rgba(0, 0, 0, 0.02), 2px 0 4px 0 rgba(0, 0, 0, 0.02);
+}
+.list ul li,
+.menu_card ul li {
+  /* background-color: #467ca2; */
+  /* border: solid 1px #316a91; */
+  border-bottom: 0;
+  display: flex;
+  align-items: center;
+}
+.list ul li a,
+.menu_card ul li a {
+  padding-left: 10px;
+  /* color: #fff; */
+  color: var(--red);
+  font-size: 14px;
+  display: block;
+  font-weight: bold;
+  /* height: 40px; */
+  /* line-height: 2.6; */
+  position: relative;
+  transition: all 0.3s ease;
+  cursor: pointer;
+  margin: 8px 0;
+}
+
+#menuList li a:hover {
+  margin-left: 10px;
+}
+
+.list ul li .active {
+  margin-left: 10px;
+  color: rgba(0, 0, 0, 0.45);
+}
+.field_item {
+  text-indent: 0px;
+}

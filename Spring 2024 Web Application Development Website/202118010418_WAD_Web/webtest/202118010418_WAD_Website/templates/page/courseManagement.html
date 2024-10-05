@@ -1,0 +1,928 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <!-- 课程管理 -->
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="ie=edge" />
+    <meta
+      name="viewport"
+      content="width=device-width, user-scalable=no, initial-scale=1.0"
+    />
+    <link rel="stylesheet" href="../../static/css/reset.css" />
+    <link rel="stylesheet" href="../../static/css/common.css" />
+    <link rel="stylesheet" href="../../static/css/message.css" />
+    <link rel="stylesheet" href="../../static/css/page.css" />
+    <title>courseManagement</title>
+  </head>
+
+  <body>
+    <div class="w100w h100h p_relative box-sizing padding-sm flex-column">
+      <div class="search_form flex align-center">
+        <div class="flex margin-right-xl">
+          <div class="field both">
+            <span>CourseName：</span>
+            <input
+              id="courseName"
+              class="field_input"
+              type="text"
+              placeholder="Please enter"
+            />
+          </div>
+          <div class="field both flex align-center">
+            <span>TeacherName：</span>
+            <input
+              id="teacherName"
+              class="field_input"
+              type="text"
+              placeholder="Please enter"
+            />
+          </div>
+        </div>
+        <div class="flex align-center text-lg">
+          <button id="search" class="def_btn bg-blue">SearchAll</button>
+          <button id="viewSelectedCourse" class="def_btn bg-orange">
+            SelectedCourse
+          </button>
+          <button id="viewAssignmentsCourse" class="def_btn bg-orange">
+            ViewAssignmentsCourse
+          </button>
+          <button id="viewUnapprovedCourse" class="def_btn bg-orange">
+            Student Enroll
+          </button>
+          <button id="add" class="def_btn bg-orange">Add</button>
+        </div>
+      </div>
+      <div class="flex1 margin-top-sm">
+        <table class="tableBox">
+          <thead>
+            <tr class="w100 flex align-center">
+              <th class="w10">ID</th>
+              <th class="flex1">CourseName</th>
+              <th class="flex1">Description</th>
+              <th class="flex1">StartTime</th>
+              <th class="flex1">EndTime</th>
+              <th class="flex1">TeacherName</th>
+              <th style="width: 250px">Operation</th>
+            </tr>
+          </thead>
+          <tbody class="tg-scroll"></tbody>
+        </table>
+      </div>
+
+      <!-- 模态窗 -->
+      <div id="modal" class="modal">
+        <div class="form">
+          <div class="text-df text-bold">
+            <span id="modal_title" class="modal_title">Add</span
+            ><span class="closeModal pointer"> X </span>
+          </div>
+          <hr />
+          <div class="flex flex-column padding-tb padding-lr-sm">
+            <div id="modal_course" class="field flex align-center">
+              <span class="field_label">CourseName：</span>
+              <input
+                id="modal_course_name"
+                class="field_input flex1"
+                type="text"
+                placeholder="Please enter"
+              />
+            </div>
+            <div class="field flex align-center margin-top">
+              <span class="field_label">Description：</span>
+              <input
+                id="modal_description"
+                class="field_input flex1"
+                type="text"
+                placeholder="Please enter"
+              />
+            </div>
+            <div class="field flex align-center margin-top">
+              <span class="field_label">Teacher：</span>
+              <div class="flex1 filter-box select2">
+                <div class="filter-text">
+                  <input
+                    id="modal-filter-teacher"
+                    class="filter-title flex1"
+                    type="text"
+                    readonly
+                    placeholder="Please select"
+                  />
+                  <i class="icon icon-filter-arrow"></i>
+                </div>
+                <select id="teacher-select" name="filter"></select>
+              </div>
+            </div>
+            <div class="field flex align-center margin-top">
+              <span class="field_label">StartTime：</span>
+              <input
+                id="modal_startTime"
+                class="field_input flex1"
+                type="date"
+                lang="en"
+                placeholder="Please enter"
+              />
+            </div>
+            <div class="field flex align-center margin-top">
+              <span class="field_label">EndTime：</span>
+              <input
+                id="modal_endTime"
+                class="field_input flex1"
+                type="date"
+                lang="en"
+                placeholder="Please enter"
+              />
+            </div>
+          </div>
+          <div class="flex align-center justify-center">
+            <div class="flex">
+              <button class="closeModal def_btn bg-white">Close</button>  
+              <button class="addInfo def_btn bg-blue">Confirm</button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- 模态窗 -->
+      <div id="add_modal" class="modal">
+        <div class="form">
+          <div class="text-df text-bold">
+            <span class="modal_title add_modal_title">Add Course</span
+            ><span class="closeCourseModal pointer"> X </span>
+          </div>
+          <hr />
+          <div class="flex flex-column padding-tb padding-lr-sm">
+            <div class="field flex align-center">
+              <span class="field_label">Name：</span>
+              <input
+                id="modal_courseware_name"
+                class="field_input"
+                type="text"
+                placeholder="Please enter"
+              />
+            </div>
+
+            <div class="field flex align-center margin-top">
+              <span class="field_label">Content：</span>
+              <textarea
+                id="modal_courseware_content"
+                class="field_input"
+                rows="5"
+                placeholder="Please enter"
+              ></textarea>
+            </div>
+
+            <div class="p_relative margin-top">
+              <button class="w100 def_btn bg-white">UploadFile</button>  
+              <input
+                class="p_absolute"
+                id="fileInput"
+                style="opacity: 0; margin-bottom: 0; left: 0; top: 0"
+                type="file"
+              />
+            </div>
+            <a id="file_name" href="" target="_blank"></a>
+          </div>
+          <div class="flex align-center justify-center">
+            <div class="flex">
+              <button class="closeCourseModal def_btn bg-white">Close</button>  
+              <button class="addCourseInfo def_btn bg-blue">Confirm</button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- 新增作业修改模态窗 -->
+      <div id="add_job_modal" class="modal">
+        <div class="form">
+          <div class="text-df text-bold">
+            <span class="modal_title">Add</span
+            ><span class="closeJobModal pointer"> X </span>
+          </div>
+          <hr />
+          <div class="flex flex-column padding-tb padding-lr-sm">
+            <div class="field flex align-center">
+              <span class="field_label">Name：</span>
+              <input
+                id="modal_name"
+                class="field_input flex1"
+                type="text"
+                placeholder="Please enter"
+              />
+            </div>
+            <div class="field flex align-center margin-top">
+              <span class="field_label">Description：</span>
+              <textarea
+                id="modal_job_description"
+                class="field_input"
+                rows="5"
+                placeholder="Please enter"
+              ></textarea>
+            </div>
+            <div class="field flex align-center margin-top">
+              <span class="field_label">EndTime：</span>
+              <input
+                id="modal_job_endTime"
+                class="field_input flex1"
+                type="datetime-local"
+                lang="en"
+                placeholder="Please enter"
+              />
+            </div>
+            <div class="p_relative margin-top">
+              <button class="w100 def_btn bg-white">UploadFile</button>  
+              <input
+                class="p_absolute"
+                id="fileInput2"
+                style="opacity: 0; margin-bottom: 0; left: 0; top: 0"
+                type="file"
+              />
+            </div>
+            <a id="file_name2" href="" target="_blank"></a>
+          </div>
+          <div class="flex align-center justify-center">
+            <div class="flex">
+              <button class="closeJobModal def_btn bg-white">Close</button>  
+              <button class="addJobInfo def_btn bg-blue">Confirm</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <style type="text/css"></style>
+    <script src="../../static/js/jquery.js"></script>
+    <script src="../../static/js/select.js"></script>
+    <script src="../../static/js/request.js"></script>
+    <script src="../../static/js/storage.js"></script>
+    <script src="../../static/js/message.js"></script>
+    <script src="../../static/js/utils.js"></script>
+    <script>
+      $(function () {
+        let logindata = load("logindata") || {};
+        let filePath = "";
+        let list = [];
+        let sIds = []; // 用户已选的课程id
+        let teacherList = [];
+        let subjectList = [];
+        let searchData = {
+          userId: logindata.id,
+        };
+        let isClickView = false;
+
+        let modalData = {
+          teacherId: 0,
+        };
+        let update_id = 0;
+        let addType = 0; // 0: 课件 1: 讲座
+
+        $("#add")[logindata.type === "Admin" ? "show" : "hide"]();
+        function getList(otherParams) {
+          let name = $("#courseName").val().trim();
+          let teacherName = $("#teacherName").val().trim();
+          isClickView = !!otherParams;
+          let params = {
+            name,
+            teacherName,
+            ...(otherParams || {}),
+            ...searchData,
+          };
+          post(
+            "/course",
+            params || {},
+            function (res) {
+              if (res) {
+                list = res.data || [];
+                // sIds = res.data.sIds || [];
+                updateList();
+              }
+            },
+            function (err) {}
+          );
+        }
+        function getUnapprovedCourse() {
+          post(
+            "/getSelectCourse",
+            {},
+            function (res) {
+              if (res) {
+                list = res.data || [];
+                updateCheckList();
+              }
+            },
+            function (err) {}
+          );
+        }
+        function getUser() {
+          post(
+            "/userList",
+            { identity: 1, userId: logindata.id },
+            function (res) {
+              getList(
+                logindata.identity == 2 && {
+                  studentId: logindata.id,
+                }
+              );
+              if (res) {
+                teacherList = res.data || [];
+                // updateSelect(teacherList);
+              }
+            },
+            function (err) {}
+          );
+        }
+        // function getSubject() {
+        //   post(
+        //     "/getSubject",
+        //     {},
+        //     function (res) {
+        //       if (res) {
+        //         subjectList = res.data || [];
+        //         updateSubSelect(subjectList);
+        //       }
+        //     },
+        //     function (err) {}
+        //   );
+        // }
+
+        function updateSelect(list) {
+          $("#filter-select").html("");
+          $("#filter-select").append("<option selected value=''>All</option>");
+          if (list && list.length) {
+            $("#filter-select").append(
+              list.reduce(
+                (t, c) => (t += `<option value=${c.id}>${c.username}</option>`),
+                ""
+              )
+            );
+          }
+          $(".select1").selectFilter({
+            callBack: function (val) {
+              //返回选择的值
+              searchData.teacherId = val;
+              console.log(val + "-是返回的值");
+            },
+          });
+        }
+        function updateTeacherSelect(list) {
+          $("#teacher-select").html("");
+          if (list && list.length) {
+            $("#teacher-select").append(
+              list.reduce(
+                (t, c) => (t += `<option value=${c.id}>${c.username}</option>`),
+                ""
+              )
+            );
+          }
+          $(".select2").selectFilter({
+            callBack: function (val) {
+              //返回选择的值
+              modalData.teacherId = val;
+              console.log(val + "-是返回的值");
+            },
+          });
+        }
+        function updateSubSelect(list) {
+          $("#subject-select").html("");
+          if (list && list.length) {
+            $("#subject-select").append(
+              list.reduce(
+                (t, c) => (t += `<option value=${c.id}>${c.name}</option>`),
+                ""
+              )
+            );
+          }
+        }
+        getUser();
+        // setTimeout(() => {
+        //   getSubject();
+        // }, 1000);
+        $("#search").click(function () {
+          getList();
+        });
+        $("#add").click(function () {
+          showModal();
+        });
+        $("#viewSelectedCourse").click(function () {
+          getList({
+            studentId: logindata.id,
+          });
+        });
+        if (logindata.identity != 2) $("#viewSelectedCourse").hide();
+        $("#viewAssignmentsCourse").click(function () {
+          getList({
+            teacherId: logindata.id,
+          });
+        });
+        if (logindata.identity != 1) $("#viewAssignmentsCourse").hide();
+        $("#viewUnapprovedCourse").click(function () {
+          getUnapprovedCourse();
+        });
+        if (logindata.identity !== 0) $("#viewUnapprovedCourse").hide();
+        $(".closeModal").click(function () {
+          closeModal();
+        });
+        $(".closeCourseModal").click(function () {
+          closeCourseModal();
+        });
+        $(".closeJobModal").click(function () {
+          closeJobModal();
+        });
+        $(".addInfo").click(function () {
+          let name = $("#modal_course_name").val().trim();
+          let description = $("#modal_description").val().trim();
+          let startTime = $("#modal_startTime").val().trim();
+          let endTime = $("#modal_endTime").val().trim();
+          if (
+            !name ||
+            !description ||
+            !modalData.teacherId ||
+            !startTime ||
+            !endTime
+          ) {
+            $.message({
+              type: "error",
+              content: "The form is not filled out completely!",
+            });
+            return;
+          }
+          post(
+            update_id ? "/updateCourse" : "/addCourse",
+            {
+              id: update_id || undefined,
+              name,
+              description,
+              startTime,
+              endTime,
+              ...modalData,
+            },
+            function (res) {
+              $.message({
+                type: "success",
+                content: "Operation successful！",
+              });
+              getList();
+              closeModal();
+            },
+            function (err) {}
+          );
+        });
+        $(".addCourseInfo").click(function () {
+          let name = $("#modal_courseware_name").val().trim();
+          let content = $("#modal_courseware_content").val().trim();
+          if (!name || !content) {
+            $.message({
+              type: "error",
+              content: "The form is not filled out completely!",
+            });
+            return;
+          }
+          post(
+            "/addCourseware",
+            {
+              courseId: update_id,
+              name,
+              type: addType,
+              filePath,
+              content,
+            },
+            function (res) {
+              $.message({
+                type: "success",
+                content: "Operation successful！",
+              });
+              getList(
+                logindata.identity == 1
+                  ? {
+                      teacherId: logindata.id,
+                    }
+                  : undefined
+              );
+              closeCourseModal();
+            },
+            function (err) {}
+          );
+        });
+        $("#fileInput,#fileInput2").on("change", function () {
+          let file = $(this)[0].files[0];
+          console.log("this===", this, file);
+          if (file) {
+            let formData = new FormData();
+            formData.append("file", file);
+            upload("/uploadFile", formData, function (res) {
+              filePath = res && res.data ? res.data.filePath || "" : "";
+              $("#file_name").text(filePath);
+              $("#file_name").attr("href", filePath);
+              $("#file_name2").text(filePath);
+              $("#file_name2").attr("href", filePath);
+            });
+          } else {
+            console.log("No file selected.");
+          }
+        });
+        $(".addJobInfo").click(function () {
+          let name = $("#modal_name").val().trim();
+          let description = $("#modal_job_description").val().trim();
+          let endTime = $("#modal_job_endTime").val().trim();
+          if (!description || !name || !endTime) {
+            $.message({
+              type: "error",
+              content: "The form is not filled out completely!",
+            });
+            return;
+          }
+          post(
+            "/addHomework",
+            {
+              courseId: update_id || undefined,
+              name,
+              description,
+              filePath,
+              endTime,
+            },
+            function (res) {
+              $.message({
+                type: "success",
+                content: "Operation successful!",
+              });
+              getList({
+                teacherId: logindata.id,
+              });
+              closeJobModal();
+            },
+            function (err) {}
+          );
+        });
+        $("tbody").on(
+          "click",
+          "#delete,#update,#add_course,#add_lecture,#add_job,#select_course,#check,#refuse,#cancel_select,#course_name",
+          function (e) {
+            if (e.target.id === "delete") {
+              let id = ~~$(this)
+                .parent()
+                .parent()
+                .parent()
+                .children()
+                .eq(0)
+                .text();
+              post(
+                "/rmCourse",
+                {
+                  id,
+                },
+                function (res) {
+                  $.message({
+                    type: "success",
+                    content: "Operation successful！",
+                  });
+                  getList();
+                },
+                function (err) {}
+              );
+            }
+            if (e.target.id === "update") {
+              update_id = ~~$(this)
+                .parent()
+                .parent()
+                .parent()
+                .children()
+                .eq(0)
+                .text();
+              const data = list.find((i) => i.id == update_id) || {};
+              $("#modal_course_name").val(data.name || "");
+              $("#modal_description").val(data.description || "");
+              $("#modal-filter-teacher").val(data.teacherName || "");
+              // $("#modal-filter-subject").val(data.subject || "");
+              // $("#modal_subject").hide();
+              $("#modal_startTime").val(formatDate(data.startTime || ""));
+              $("#modal_endTime").val(formatDate(data.endTime || ""));
+              modalData.teacherId = data.teacherId;
+              showModal();
+            }
+            if (e.target.id === "check" || e.target.id === "refuse") {
+              const id = ~~$(this)
+                .parent()
+                .parent()
+                .parent()
+                .children()
+                .eq(0)
+                .text();
+              post(
+                "/updateSelectCourse",
+                {
+                  id,
+                  status: e.target.id === "check" ? 1 : -1,
+                },
+                function (res) {
+                  $.message({
+                    type: "success",
+                    content: "Operation successful！",
+                  });
+                  getUnapprovedCourse();
+                },
+                function (err) {}
+              );
+            }
+            if (e.target.id === "add_course") {
+              update_id = ~~$(this)
+                .parent()
+                .parent()
+                .parent()
+                .children()
+                .eq(0)
+                .text();
+              addType = 0;
+              showAddCourseModal();
+            }
+            if (e.target.id === "add_lecture") {
+              update_id = ~~$(this)
+                .parent()
+                .parent()
+                .parent()
+                .children()
+                .eq(0)
+                .text();
+              addType = 1;
+              showAddCourseModal();
+            }
+            if (e.target.id === "add_job") {
+              update_id = ~~$(this)
+                .parent()
+                .parent()
+                .parent()
+                .children()
+                .eq(0)
+                .text();
+              showAddJobModal();
+            }
+            if (e.target.id == "cancel_select") {
+              let courseId = ~~$(this)
+                .parent()
+                .parent()
+                .parent()
+                .children()
+                .eq(0)
+                .text();
+
+              post(
+                "/rmSelectCourse",
+                {
+                  courseId,
+                  studentId: logindata.id,
+                },
+                function (res) {
+                  $.message({
+                    type: "success",
+                    content: "Operation successful！",
+                  });
+                  getList();
+                },
+                function (err) {
+                  if (err.code === -1) {
+                    $.message({
+                      type: "error",
+                      content:
+                        "You have not applied for this course yet, please apply first!",
+                    });
+                  }
+                }
+              );
+            }
+            if (e.target.id == "select_course") {
+              let courseId = ~~$(this)
+                .parent()
+                .parent()
+                .parent()
+                .children()
+                .eq(0)
+                .text();
+              const data = list.find((i) => i.id == courseId) || {};
+              const isSelect = data.isSelect;
+              if (isSelect && data.status != -1) return;
+              post(
+                "/selectCourse",
+                {
+                  studentId: logindata.id,
+                  courseId,
+                },
+                function (res) {
+                  $.message({
+                    type: "success",
+                    content: "Operation successful！",
+                  });
+                  getList();
+                },
+                function (err) {
+                  if (err.code === -1) {
+                    $.message({
+                      type: "error",
+                      content:
+                        "Selected courses awaiting administrator review!",
+                    });
+                  }
+                }
+              );
+            }
+            if (e.target.id == "course_name") {
+              let courseId = ~~$(this)
+                .parent()
+                .parent()
+                .children()
+                .eq(0)
+                .text();
+              let courseName = $(this).text();
+              const data = {
+                id: courseId,
+                courseName,
+                name: "LectureManagement",
+              };
+              window.parent.postMessage(JSON.stringify(data), "*");
+            }
+          }
+        );
+
+        function updateCheckList() {
+          $("thead").html("");
+          $("thead").append(`
+            <tr class="w100 flex align-center">
+              <th class="w10">ID</th>
+              <th class="flex1">CourseName</th>
+              <th class="flex1">StudentName</th>
+              <th style="width: 200px">Operation</th>
+            </tr>
+          `);
+
+          $("tbody").html("");
+          if (list && list.length) {
+            $("tbody").prepend(
+              list.reduce((t, c) => {
+                t += ` <tr class="w100 flex align-center">
+                    <td class="w10">${c.id || ""}</td>
+                    <td class="flex1">${c.courseName || ""}</td>
+                    <td class="flex1">${c.studentName || ""}</td>
+                    <td style="width: 200px" >
+                      <div class="w100 flex justify-around" style="margin: 10px 0">
+                        <button id="check" class="td_btn bg-blue ">Approval</button>
+                        <button id="refuse" class="td_btn bg-red ">Refuse</button>
+                      </div>
+                    </td>
+            </tr>`;
+                return t;
+              }, "")
+            );
+          }
+        }
+
+        //渲染列表数据
+        function updateList() {
+          $("thead").html("");
+          $("thead").append(`
+            <tr class="w100 flex align-center">
+              <th class="w10">ID</th>
+              <th class="flex1">CourseName</th>
+              <th class="flex1">Description</th>
+              <th class="flex1">StartTime</th>
+              <th class="flex1">EndTime</th>
+              <th class="flex1">TeacherName</th>
+              <th style="width: 350px">Operation</th>
+            </tr>
+          `);
+          $("tbody").html("");
+          if (list && list.length) {
+            $("tbody").prepend(
+              list.reduce((t, c) => {
+                const isSelect = c.isSelect;
+                const footer = `<div class="w100 flex justify-around" style="margin: 10px 0">
+                ${
+                  logindata.type === "Student"
+                    ? `<button id="select_course" class="td_btn bg-${
+                        isSelect && c.status != -1 ? "grey" : "blue"
+                      } ">${
+                        isSelect && c.status != -1 ? "Selected" : "Select"
+                      }</button>${
+                        c.status == 0
+                          ? '<button id="cancel_select" class="td_btn bg-orange ">CancelSelect</button>'
+                          : ""
+                      }`
+                    : ""
+                }
+                  ${
+                    logindata.type === "Admin"
+                      ? `
+                      <button id="delete" class="td_btn bg-red ">Delete</button>
+                  <button id="update" class="td_btn bg-orange ">Modify</button>`
+                      : ""
+                  }
+                  ${
+                    (logindata.type === "Instructor"
+                      ? isClickView || c.teacherId === logindata.id
+                      : false) || logindata.type === "Admin"
+                      ? `<button id="add_lecture" class="td_btn bg-blue ">AddLecture</button>`
+                      : ""
+                  }
+                  ${
+                    (
+                      logindata.type === "Instructor"
+                        ? isClickView || c.teacherId === logindata.id
+                        : false
+                    )
+                      ? `
+                      <button id="add_course" class="td_btn bg-orange ">AddCourseware</button>
+                      <button id="add_job" class="td_btn bg-green ">AddJob</button>`
+                      : ""
+                  }
+                </div>`;
+                t += ` <tr class="w100 flex align-center">
+                    <td class="w10">${c.id || ""}</td>
+                    <td class="flex1">${
+                      logindata.type === "Admin" ||
+                      (logindata.type === "Student" && c.status == 1) ||
+                      (logindata.type === "Instructor" &&
+                        c.teacherId === logindata.id)
+                        ? `<span id="course_name" class='text-blue pointer'>${
+                            c.name || ""
+                          }</span>`
+                        : c.name || ""
+                    }</td>
+                    <td class="flex1">${c.description || ""}</td>
+                    <td class="flex1">
+                        ${c.startTime || ""}
+                    </td>
+                    <td class="flex1">
+                        ${c.endTime || ""}
+                    </td>
+                    <td class="flex1 ellipsis">
+                        ${c.teacherName || ""}
+                    </td>
+                    <td style="width: 350px" >
+                        ${footer}
+                    </td>
+            </tr>`;
+                return t;
+              }, "")
+            );
+          }
+        }
+
+        function showAddCourseModal() {
+          $(".add_modal_title").text(
+            addType === 0 ? "Add Course" : "Add Lecture"
+          );
+          $("#add_modal").fadeIn();
+        }
+
+        function showAddJobModal() {
+          $("#add_job_modal").fadeIn();
+          $("#modal_job_endTime").val(formatDateTime(new Date()));
+        }
+
+        function closeCourseModal() {
+          $("#add_modal").fadeOut();
+          $("#modal_courseware_name").val("");
+          $("#modal_courseware_content").val("");
+          $("#file_name").text("");
+          filePath = "";
+          update_id = 0;
+        }
+
+        function closeJobModal() {
+          $("#add_job_modal").fadeOut();
+          $("#modal_name").val("");
+          $("#modal_job_description").val("");
+          update_id = 0;
+        }
+
+        function showModal() {
+          $("#modal_title").text(update_id ? "Modify" : "Add");
+          $("#modal").fadeIn();
+          $("#modal_startTime").val(formatDate(new Date()));
+          $("#modal_endTime").val(formatDate(new Date()));
+          if (!$("#teacher-select").children().length) {
+            updateTeacherSelect(teacherList || []);
+          }
+          // updateSubSelect(subjectList || []);
+          // $(".select3").selectFilter({
+          //   callBack: function (val) {
+          //     //返回选择的值
+          //     modalData.subject = val;
+          //     console.log(val + "-是返回的值");
+          //   },
+          // });
+        }
+        function closeModal() {
+          $("#modal").fadeOut();
+          $("#modal_course_name").val("");
+          $("#modal_description").val("");
+          $("#modal-filter-teacher").val("");
+          $("#teacher-select").val("");
+          // $("#modal_subject").show();
+          // $("#modal-filter-subject").val("");
+          $("#modal_startTime").val("");
+          $("#modal_endTime").val("");
+          $(".select2").val("");
+          // $(".select3").val("");
+          update_id = 0;
+        }
+      });
+    </script>
+  </body>
+</html>

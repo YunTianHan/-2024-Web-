@@ -1,0 +1,256 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <!-- 论坛 -->
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="ie=edge" />
+    <meta
+      name="viewport"
+      content="width=device-width, user-scalable=no, initial-scale=1.0"
+    />
+    <link rel="stylesheet" href="../../static/css/reset.css" />
+    <link rel="stylesheet" href="../../static/css/common.css" />
+    <link rel="stylesheet" href="../../static/css/message.css" />
+    <link rel="stylesheet" href="../../static/css/page.css" />
+    <title>Forum</title>
+  </head>
+
+  <body>
+    <div class="w100w h100h p_relative box-sizing padding-sm flex-column">
+      <div class="search_form flex align-center">
+        <div class="flex margin-right-xl">
+          <div class="field both">
+            <span>Title：</span>
+            <input
+              id="title"
+              class="field_input"
+              type="text"
+              placeholder="Please enter"
+            />
+          </div>
+          <!-- <div class="field both">
+            <span>PostsID：</span>
+            <input
+              id="parentId"
+              class="field_input"
+              type="text"
+              placeholder="Please enter"
+            />
+          </div> -->
+        </div>
+        <div class="flex align-center text-lg">
+          <button id="search" class="def_btn bg-blue">SearchAll</button>
+          <button id="sendSearch" class="def_btn bg-blue">SearchSent</button>
+          <button id="add" class="def_btn bg-orange">Post</button>
+        </div>
+      </div>
+      <div class="flex1 margin-top-sm">
+        <table class="tableBox">
+          <thead>
+            <tr class="w100 flex align-center">
+              <th class="w10">ID</th>
+              <th class="flex1">Username</th>
+              <th id="td_title" class="flex1">Title</th>
+              <th class="flex1">Content</th>
+              <th class="flex1">Time</th>
+              <th id="opration" style="width: 250px">Operation</th>
+            </tr>
+          </thead>
+          <tbody class="tg-scroll"></tbody>
+        </table>
+      </div>
+
+      <!-- 模态窗 -->
+      <div class="modal">
+        <div class="form">
+          <div class="text-df text-bold">
+            <span class="modal_title">Forum Post</span
+            ><span class="closeModal pointer"> X </span>
+          </div>
+          <hr />
+          <div class="flex flex-column padding-tb padding-lr-sm">
+            <div class="field flex align-center forum_title">
+              <span class="field_label">Title：</span>
+              <input
+                id="modal_title"
+                class="field_input flex1"
+                type="text"
+                placeholder="Please enter"
+              />
+            </div>
+            <div class="field flex align-center margin-top">
+              <span class="field_label">Content：</span>
+              <textarea
+                id="modal_content"
+                class="field_input"
+                rows="5"
+                placeholder="Please enter"
+              ></textarea>
+            </div>
+          </div>
+          <div class="flex align-center justify-center">
+            <div class="flex">
+              <button class="closeModal def_btn bg-white">Close</button>  
+              <button class="addInfo def_btn bg-blue">Confirm</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <style type="text/css"></style>
+    <script src="../../static/js/jquery.js"></script>
+    <script src="../../static/js/select.js"></script>
+    <script src="../../static/js/request.js"></script>
+    <script src="../../static/js/storage.js"></script>
+    <script src="../../static/js/message.js"></script>
+    <script src="../../static/js/utils.js"></script>
+    <script>
+      $(function () {
+        let logindata = load("logindata") || {};
+        let update_id = 0;
+        let list = [];
+        let userList = [];
+        let searchData = {};
+        let modalData = {
+          userId: logindata.id,
+        };
+        function getList(otherParams) {
+          let title = $("#title").val() || "";
+          // let parentId = ~~$("#parentId").val() || "";
+          let params = {
+            title,
+            ...searchData,
+            ...(otherParams || {}),
+          };
+          post(
+            "/discussion",
+            params || {},
+            function (res) {
+              if (res) {
+                list = res.data || [];
+                updateList(otherParams && !!otherParams.parentId);
+              }
+            },
+            function (err) {}
+          );
+        }
+
+        getList();
+        $("#search").click(function () {
+          getList();
+        });
+        $("#sendSearch").click(function () {
+          getList({
+            userId: logindata.id,
+          });
+        });
+        $("#add").click(function () {
+          $(".forum_title").show();
+          showModal();
+        });
+        $(".closeModal").click(function () {
+          closeModal();
+        });
+        $(".addInfo").click(function () {
+          let title = $("#modal_title").val().trim();
+          let content = $("#modal_content").val().trim();
+          if ((!update_id && !title) || !content) {
+            $.message({
+              type: "error",
+              content: "The form is not filled out completely!",
+            });
+            return;
+          }
+          post(
+            "/addDiscussion",
+            {
+              title,
+              content,
+              parentId: update_id || "",
+              addTime: getNow(),
+              ...modalData,
+            },
+            function (res) {
+              $.message({
+                type: "success",
+                content: "Operation successful",
+              });
+              getList();
+              closeModal();
+            },
+            function (err) {}
+          );
+        });
+
+        $("tbody").on("click", "#reply,#view", function (e) {
+          if (e.target.id === "reply") {
+            update_id = ~~$(this)
+              .parent()
+              .parent()
+              .parent()
+              .children()
+              .eq(0)
+              .text();
+            $(".forum_title").hide();
+            showModal();
+          }
+          if (e.target.id === "view") {
+            const id = ~~$(this)
+              .parent()
+              .parent()
+              .parent()
+              .children()
+              .eq(0)
+              .text();
+            getList({ parentId: id });
+          }
+        });
+
+        //渲染列表数据
+        function updateList(isReply) {
+          $("#opration")[isReply ? "hide" : "show"]();
+          $("#td_title")[isReply ? "hide" : "show"]();
+          $("tbody").html("");
+          if (list && list.length) {
+            const footer = `<div class="w100 flex justify-around" style="margin: 10px 0">
+                    <button id="reply" class="td_btn bg-blue ">Reply</button>
+                    <button id="view" class="td_btn bg-orange  ">View</button>
+                </div>`;
+            $("tbody").prepend(
+              list.reduce(
+                (t, c) =>
+                  (t += ` <tr class="w100 flex align-center">
+              <td class="w10">${c.id || ""}</td>
+              <td class="flex1">${c.username || ""}</td>
+              ${isReply ? "" : `<td class="flex1">${c.title || ""}</td>`}
+              <td class="flex1">${c.content || ""}</td>
+              <td class="flex1">${c.addTime || ""}</td>
+              ${
+                isReply
+                  ? ""
+                  : `<td style="width: 250px" >
+                        ${footer}
+                    </td>`
+              }
+      </tr>`),
+                ""
+              )
+            );
+          }
+        }
+
+        function showModal() {
+          $(".modal_title").text(update_id ? "Reply" : "ForumPosting");
+          $(".modal").fadeIn();
+        }
+        function closeModal() {
+          $(".modal").fadeOut();
+          $("#modal_title").val("");
+          $("#modal_content").val("");
+          update_id = 0;
+        }
+      });
+    </script>
+  </body>
+</html>

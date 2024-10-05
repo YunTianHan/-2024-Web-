@@ -1,0 +1,682 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <!-- 作业管理 -->
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="ie=edge" />
+    <meta
+      name="viewport"
+      content="width=device-width, user-scalable=no, initial-scale=1.0"
+    />
+    <link rel="stylesheet" href="../../static/css/reset.css" />
+    <link rel="stylesheet" href="../../static/css/common.css" />
+    <link rel="stylesheet" href="../../static/css/message.css" />
+    <link rel="stylesheet" href="../../static/css/page.css" />
+    <title>jobManagement</title>
+  </head>
+
+  <body>
+    <div class="w100w h100h p_relative box-sizing padding-sm flex-column">
+      <div class="search_form flex align-center">
+        <div class="flex margin-right-xl">
+          <div class="field both">
+            <span>Name：</span>
+            <input
+              id="coursewareName"
+              class="field_input"
+              type="text"
+              placeholder="Please enter"
+            />
+          </div>
+          <div class="field both flex align-center">
+            <span>Course：</span>
+            <div class="filter-box select1">
+              <div class="filter-text">
+                <input
+                  class="filter-title"
+                  type="text"
+                  readonly
+                  placeholder="Please select"
+                />
+                <i class="icon icon-filter-arrow"></i>
+              </div>
+              <select id="filter-select" name="filter"></select>
+            </div>
+          </div>
+        </div>
+
+        <div class="flex align-center text-lg">
+          <button id="search" class="def_btn bg-blue">Search</button>
+          <button id="add" class="def_btn bg-orange">Add</button>
+        </div>
+      </div>
+      <div class="flex1 margin-top-sm">
+        <table class="tableBox">
+          <thead>
+            <tr class="w100 flex align-center">
+              <th class="w10">ID</th>
+              <th class="flex1">Name</th>
+              <th class="flex1">CourseName</th>
+              <th class="flex1">Description</th>
+              <th class="flex1">FilePath</th>
+              <th class="flex1">EndTime</th>
+              <th style="width: 300px">Operation</th>
+            </tr>
+          </thead>
+          <tbody class="tg-scroll"></tbody>
+        </table>
+      </div>
+
+      <!-- 新增修改模态窗 -->
+      <div id="updateModal" class="modal">
+        <div class="form">
+          <div class="text-df text-bold">
+            <span class="modal_title">Add</span
+            ><span class="closeModal pointer"> X </span>
+          </div>
+          <hr />
+          <div class="flex flex-column padding-tb padding-lr-sm">
+            <div class="field flex align-center">
+              <span class="field_label">Title：</span>
+              <input
+                id="modal_name"
+                class="field_input flex1"
+                type="text"
+                placeholder="Please enter"
+              />
+            </div>
+            <div class="field flex align-center margin-top">
+              <span class="field_label">Assignment Content：</span>
+              <textarea
+                id="modal_description"
+                class="field_input"
+                rows="5"
+                placeholder="Please enter"
+              ></textarea>
+            </div>
+          </div>
+          <div class="flex align-center justify-center">
+            <div class="flex">
+              <button class="closeModal def_btn bg-white">Close</button>  
+              <button class="addInfo def_btn bg-blue">Confirm</button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- 回复信息模态框 -->
+      <div id="answerModal" class="modal">
+        <div class="form">
+          <div class="text-df text-bold">
+            <span class="modal_title">Feedback And Grdes</span
+            ><span class="closeAnswerModal pointer"> X </span>
+          </div>
+          <hr />
+          <div class="flex flex-column padding-tb padding-lr-sm">
+            <div class="field flex align-center">
+              <span class="field_label">Reply Content：</span>
+              <textarea
+                id="modal_content"
+                class="field_input"
+                rows="5"
+                placeholder="Please enter"
+              ></textarea>
+            </div>
+            <div class="p_relative margin-top">
+              <button class="w100 def_btn bg-white">UploadFile</button>  
+              <input
+                class="p_absolute"
+                id="fileInput"
+                style="opacity: 0; margin-bottom: 0; left: 0; top: 0"
+                type="file"
+              />
+            </div>
+            <a id="file_name" href="" target="_blank"></a>
+          </div>
+          <div class="flex align-center justify-center">
+            <div class="flex">
+              <button class="closeAnswerModal def_btn bg-white">Close</button>  
+              <button class="answerConfirm def_btn bg-blue">Confirm</button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div id="add_job_modal" class="modal">
+        <div class="form">
+          <div class="text-df text-bold">
+            <span class="modal_title">Modify</span
+            ><span class="closeJobModal pointer"> X </span>
+          </div>
+          <hr />
+          <div class="flex flex-column padding-tb padding-lr-sm">
+            <div class="field flex align-center">
+              <span class="field_label">Name：</span>
+              <input
+                id="add_job_modal_name"
+                class="field_input flex1"
+                type="text"
+                placeholder="Please enter"
+              />
+            </div>
+            <div class="field flex align-center margin-top">
+              <span class="field_label">Description：</span>
+              <textarea
+                id="modal_job_description"
+                class="field_input"
+                rows="5"
+                placeholder="Please enter"
+              ></textarea>
+            </div>
+            <div class="field flex align-center margin-top">
+              <span class="field_label">EndTime：</span>
+              <input
+                id="modal_job_endTime"
+                class="field_input flex1"
+                type="datetime-local"
+                lang="en"
+                placeholder="Please enter"
+              />
+            </div>
+            <div
+              id="course-select-field"
+              class="field flex align-center margin-top"
+            >
+              <span class="field_label">Course：</span>
+              <div class="flex1 filter-box select2">
+                <div class="filter-text">
+                  <input
+                    id="modal-filter-course"
+                    class="filter-title flex1"
+                    type="text"
+                    readonly
+                    placeholder="Please select"
+                  />
+                  <i class="icon icon-filter-arrow"></i>
+                </div>
+                <select id="course-select" name="filter"></select>
+              </div>
+            </div>
+
+            <div class="p_relative margin-top">
+              <button class="w100 def_btn bg-white">UploadFile</button>  
+              <input
+                class="p_absolute"
+                id="fileInput2"
+                style="opacity: 0; margin-bottom: 0; left: 0; top: 0"
+                type="file"
+              />
+            </div>
+            <a id="file_name2" href="" target="_blank"></a>
+          </div>
+          <div class="flex align-center justify-center">
+            <div class="flex">
+              <button class="closeJobModal def_btn bg-white">Close</button>  
+              <button class="addJobInfo def_btn bg-blue">Confirm</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <style type="text/css"></style>
+    <script src="../../static/js/jquery.js"></script>
+    <script src="../../static/js/select.js"></script>
+    <script src="../../static/js/request.js"></script>
+    <script src="../../static/js/storage.js"></script>
+    <script src="../../static/js/message.js"></script>
+    <script src="../../static/js/utils.js"></script>
+    <script>
+      $(function () {
+        let logindata = load("logindata") || {};
+        let list = [];
+        let assIds = []; // 已经回答过的作业id
+        let subjectList = [];
+        let courseList = [];
+        let filePath = "";
+        let searchData = {
+          userId: logindata.id,
+        };
+        if (logindata.identity === 1) {
+          searchData.teacherId = logindata.id;
+        }
+        if (logindata.identity === 2) {
+          searchData.studentId = logindata.id;
+          $("#add").hide();
+        }
+        let modalData = {};
+        let update_id = 0;
+        let jobId = 0;
+        let teacherId = 0;
+
+        function getList() {
+          let name = $("#coursewareName").val().trim();
+          let params = {
+            name,
+            ...(searchData.courseId
+              ? { courseId: ~~searchData.courseId }
+              : searchData),
+          };
+          post(
+            "/homework",
+            params || {},
+            function (res) {
+              if (res) {
+                list = res.data || [];
+                // assIds = res.data.assIds || [];
+                updateList();
+              }
+            },
+            function (err) {}
+          );
+        }
+        function getUser() {
+          post(
+            "/course",
+            searchData,
+            function (res) {
+              getList();
+              if (res) {
+                courseList = res.data || [];
+                updateSelect(res.data || []);
+              }
+            },
+            function (err) {}
+          );
+        }
+        getUser();
+        $("#search").click(function () {
+          getList();
+        });
+        $("#add").click(function () {
+          showAddJobModal();
+        });
+        $(".closeModal").click(function () {
+          closeModal();
+        });
+        $(".closeAnswerModal").click(function () {
+          closeAnswerModal();
+        });
+        $("#fileInput,#fileInput2").on("change", function () {
+          let file = $(this)[0].files[0];
+          console.log("this===", this, file);
+          if (file) {
+            let formData = new FormData();
+            formData.append("file", file);
+            upload("/uploadFile", formData, function (res) {
+              filePath = res && res.data ? res.data.filePath || "" : "";
+              $("#file_name").text(filePath);
+              $("#file_name").attr("href", filePath);
+              $("#file_name2").text(filePath);
+              $("#file_name2").attr("href", filePath);
+            });
+          } else {
+            console.log("No file selected.");
+          }
+        });
+        $(".addInfo").click(function () {
+          let name = $("#modal_name").val().trim();
+          let description = $("#modal_description").val().trim();
+          if (!description || !name) {
+            $.message({
+              type: "error",
+              content: "The form is not filled out completely!",
+            });
+            return;
+          }
+          post(
+            update_id ? "/modiftyAssignment" : "/addAssignment",
+            {
+              id: update_id || undefined,
+              courseId: modalData.courseId || undefined,
+              name,
+              description,
+            },
+            function (res) {
+              $.message({
+                type: "success",
+                content: "Operation successful!",
+              });
+              getList();
+              closeModal();
+            },
+            function (err) {}
+          );
+        });
+        $(".answerConfirm").click(function () {
+          let content = $("#modal_content").val().trim();
+          if (!content || !filePath) {
+            $.message({
+              type: "error",
+              content: "The form is not filled out completely!",
+            });
+            return;
+          }
+          post(
+            "/addAnswer",
+            {
+              homeworkId: jobId,
+              userId: logindata.id,
+              content,
+              filePath,
+              addTime: getNow(),
+            },
+            function (res) {
+              $.message({
+                type: "success",
+                content: "Operation successful!",
+              });
+              getList();
+              closeAnswerModal();
+            },
+            function (err) {}
+          );
+        });
+        $("tbody").on(
+          "click",
+          "#add,#update,#answer_job,#download,#preview,#delete,#modify,#course_name",
+          function (e) {
+            if (e.target.id === "add") {
+              let id = ~~$(this)
+                .parent()
+                .parent()
+                .parent()
+                .children()
+                .eq(0)
+                .text();
+              const data = list.find((i) => i.id == id) || {};
+              modalData.courseId = data.courseId;
+              showModal();
+            }
+            if (e.target.id === "update") {
+              update_id = ~~$(this)
+                .parent()
+                .parent()
+                .parent()
+                .children()
+                .eq(0)
+                .text();
+              const data = list.find((i) => i.id == update_id) || {};
+              $("#modal_name").val(data.name || "");
+              $("#modal_description").val(data.description || "");
+              showModal();
+            }
+            if (e.target.id == "answer_job") {
+              jobId = ~~$(this)
+                .parent()
+                .parent()
+                .parent()
+                .children()
+                .eq(0)
+                .text();
+              const data = list.find((i) => i.id == jobId) || {};
+              const endTime = new Date(data.endTime);
+              const now = new Date();
+              if (now > endTime) {
+                $.message({
+                  type: "error",
+                  content: "The deadline has been exceeded!",
+                });
+                return;
+              }
+              showAnswerModal();
+              return;
+            }
+            if (e.target.id === "modify") {
+              update_id = ~~$(this)
+                .parent()
+                .parent()
+                .parent()
+                .children()
+                .eq(0)
+                .text();
+              showAddJobModal();
+              return;
+            }
+            if (e.target.id === "download") {
+              const url = $(this)
+                .parent()
+                .parent()
+                .parent()
+                .children()
+                .eq(4)
+                .text();
+              const link = document.createElement("a");
+              link.download = "file";
+              link.href = url;
+              link.click();
+            }
+            if (e.target.id === "preview") {
+              const path = $(this).parent().parent().children().eq(4).text();
+              window.open(path);
+            }
+            if (e.target.id == "delete") {
+              const id = ~~$(this)
+                .parent()
+                .parent()
+                .parent()
+                .children()
+                .eq(0)
+                .text();
+              post(
+                "/rmHomework",
+                {
+                  id,
+                },
+                function (res) {
+                  $.message({
+                    type: "success",
+                    content: "Operation successful！",
+                  });
+                  getList();
+                },
+                function (err) {}
+              );
+            }
+            if (e.target.id == "course_name") {
+              const jobId = ~~$(this).parent().parent().children().eq(0).text();
+              const jobName = $(this).parent().parent().children().eq(1).text();
+              save("jobParams", { jobId, jobName });
+              window.parent.postMessage(
+                JSON.stringify({
+                  name: "FeedbackAndGrdes",
+                }),
+                "*"
+              );
+            }
+          }
+        );
+
+        function updateSelect(list) {
+          $("#filter-select").html("");
+          $("#filter-select").append("<option selected value=''>All</option>");
+          if (list && list.length) {
+            $("#filter-select").append(
+              list.reduce(
+                (t, c) => (t += `<option value=${c.id}>${c.name}</option>`),
+                ""
+              )
+            );
+          }
+          $(".select1").selectFilter({
+            callBack: function (val) {
+              //返回选择的值
+              searchData.courseId = val;
+              console.log(val + "-是返回的值");
+            },
+          });
+        }
+
+        //渲染列表数据
+        function updateList() {
+          $("tbody").html("");
+          if (list && list.length) {
+            $("tbody").prepend(
+              list.reduce((t, c) => {
+                const isAnswer = assIds.includes(c.id);
+                const footer = `<div class="w100 flex justify-around" style="margin: 10px 0">
+                ${
+                  logindata.type === "Student"
+                    ? `<button id="answer_job" class="td_btn bg-${
+                        isAnswer ? "grey" : "blue"
+                      } ">${isAnswer ? "ReplyReceived" : "Reply"}</button>`
+                    : ""
+                }
+                  ${
+                    logindata.type === "Instructor"
+                      ? `
+                      <button id="modify" class="td_btn bg-orange ">Modify</button>
+                      <button id="delete" class="td_btn bg-red ">Delete</button>
+                        `
+                      : ""
+                  }
+                <button id="download" class="td_btn bg-blue ">Download</button>
+                </div>`;
+                t += ` <tr class="w100 flex align-center">
+                    <td class="w10">${c.id || ""}</td>
+                    <td class="flex1">${
+                      logindata.type === "Admin" ||
+                      logindata.type === "Instructor"
+                        ? `<span id="course_name" class='text-blue pointer'>${
+                            c.name || ""
+                          }</span>`
+                        : c.name || ""
+                    }</td>
+                    <td class="flex1">
+                        ${c.courseName || ""}
+                    </td>
+                    <td class="flex1">${c.description || ""}</td>
+                    <td class="flex1 ellipsis pointer">
+                      <a id="preview">${c.filePath || ""}</a>
+                    </td>
+                    <td class="flex1 ellipsis pointer">
+                      ${c.endTime || ""}
+                    </td>
+                    <td style="width: 300px" >
+                        ${logindata.type === "Admin" ? "nothing" : footer}
+                    </td>
+            </tr>`;
+                return t;
+              }, "")
+            );
+          }
+        }
+
+        function showModal() {
+          $(".modal_title").text(update_id ? "modify" : "Add");
+          $("#updateModal").fadeIn();
+        }
+        function closeModal() {
+          $("#updateModal").fadeOut();
+          $("#modal_name").val("");
+          $("#modal_description").val("");
+          modalData = {};
+          update_id = 0;
+        }
+        function showAnswerModal() {
+          $("#answerModal").fadeIn();
+        }
+        function closeAnswerModal() {
+          $("#answerModal").fadeOut();
+          $("#modal_content").val("");
+          $("#file_name").text("");
+          filePath = "";
+          jobId = 0;
+        }
+
+        // 新增
+        function updateCourseSelect() {
+          $("#course-select").html("");
+          if (courseList && courseList.length) {
+            $("#course-select").append(
+              courseList.reduce(
+                (t, c) => (t += `<option value=${c.id}>${c.name}</option>`),
+                ""
+              )
+            );
+          }
+          $(".select2").selectFilter({
+            callBack: function (val) {
+              //返回选择的值
+              modalData.courseId = val;
+              console.log(val + "-是返回的值");
+            },
+          });
+        }
+
+        $(".addJobInfo").click(function () {
+          let name = $("#add_job_modal_name").val().trim();
+          let description = $("#modal_job_description").val().trim();
+          let endTime = $("#modal_job_endTime").val().trim();
+          if (
+            !description ||
+            !name ||
+            !endTime ||
+            (!update_id && !modalData.courseId)
+          ) {
+            $.message({
+              type: "error",
+              content: "The form is not filled out completely!",
+            });
+            return;
+          }
+          const data = list.find((item) => item.id === update_id);
+          post(
+            update_id ? "/updateHomework" : "/addHomework",
+            {
+              id: update_id,
+              courseId: update_id ? data.courseId : modalData.courseId,
+              name,
+              description,
+              filePath,
+              endTime,
+            },
+            function (res) {
+              $.message({
+                type: "success",
+                content: "Operation successful!",
+              });
+              getList();
+              closeJobModal();
+            },
+            function (err) {}
+          );
+        });
+
+        function showAddJobModal() {
+          $("#add_job_modal").fadeIn();
+          if (update_id) {
+            const data = list.find((item) => item.id === update_id);
+            $("#add_job_modal_name").val(data.name);
+            $("#modal_job_description").val(data.description);
+            $("#file_name2").text(data.filePath);
+            $("#file_name2").attr("href", data.filePath);
+            $("#modal_job_endTime").val(formatDateTime(data.endTime));
+            $("#course-select-field").hide();
+            return;
+          }
+          $("#course-select-field").show();
+          $("#modal_job_endTime").val(formatDateTime(new Date()));
+          if (!$("#course-select").children().length) {
+            updateCourseSelect();
+          }
+        }
+
+        $(".closeJobModal").click(function () {
+          closeJobModal();
+        });
+
+        function closeJobModal() {
+          $("#add_job_modal").fadeOut();
+          $("#add_job_modal_name").val("");
+          $("#modal_job_description").val("");
+          $("#file_name2").text("");
+          $("#file_name2").attr("href", "");
+          filePath = "";
+          update_id = 0;
+          modalData = {};
+        }
+      });
+    </script>
+  </body>
+</html>

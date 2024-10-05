@@ -1,0 +1,387 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <!-- 课件管理 -->
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="ie=edge" />
+    <meta
+      name="viewport"
+      content="width=device-width, user-scalable=no, initial-scale=1.0"
+    />
+    <link rel="stylesheet" href="../../static/css/reset.css" />
+    <link rel="stylesheet" href="../../static/css/common.css" />
+    <link rel="stylesheet" href="../../static/css/message.css" />
+    <link rel="stylesheet" href="../../static/css/page.css" />
+    <title>CoursewareManagement</title>
+  </head>
+
+  <body>
+    <div class="w100w h100h p_relative box-sizing padding-sm flex-column">
+      <div class="search_form flex align-center">
+        <div class="flex margin-right-xl">
+          <div class="field both">
+            <span>Name：</span>
+            <input
+              id="coursewareName"
+              class="field_input"
+              type="text"
+              placeholder="Please enter"
+            />
+          </div>
+          <div class="field both flex align-center">
+            <span>Course：</span>
+            <div class="filter-box">
+              <div class="filter-text">
+                <input
+                  class="filter-title"
+                  type="text"
+                  readonly
+                  placeholder="Please select"
+                />
+                <i class="icon icon-filter-arrow"></i>
+              </div>
+              <select id="filter-select" name="filter"></select>
+            </div>
+          </div>
+        </div>
+        <div class="flex align-center text-lg">
+          <button id="search" class="def_btn bg-blue">Search</button>
+        </div>
+      </div>
+      <div class="flex1 margin-top-sm">
+        <table class="tableBox">
+          <thead>
+            <tr class="w100 flex align-center">
+              <th class="w10">ID</th>
+              <th class="flex1">Name</th>
+              <th class="flex1">CourseName</th>
+              <th class="flex1">FilePath</th>
+              <th class="flex1">Content</th>
+              <th style="width: 250px">Operation</th>
+            </tr>
+          </thead>
+          <tbody class="tg-scroll"></tbody>
+        </table>
+        <div id="list" class="flex flex-column"></div>
+      </div>
+
+      <!-- 模态窗 -->
+      <div class="modal">
+        <div class="form">
+          <div class="text-df text-bold">
+            <span class="modal_title">Modify</span
+            ><span class="closeModal pointer"> X </span>
+          </div>
+          <hr />
+          <div class="flex flex-column padding-tb padding-lr-sm">
+            <div class="field flex align-center">
+              <span class="field_label">CoursewareName：</span>
+              <input
+                id="modal_courseware_name"
+                class="field_input"
+                type="text"
+                placeholder="Please enter"
+              />
+            </div>
+            <div class="field flex align-center margin-top">
+              <span class="field_label">Content：</span>
+              <textarea
+                id="modal_content"
+                class="field_input"
+                rows="5"
+                placeholder="Please enter"
+              ></textarea>
+            </div>
+            <div class="p_relative margin-top">
+              <button class="w100 def_btn bg-white">UploadFile</button>  
+              <input
+                class="p_absolute"
+                id="fileInput"
+                style="opacity: 0; margin-bottom: 0; left: 0; top: 0"
+                type="file"
+              />
+            </div>
+            <a id="file_name" href="" target="_blank"></a>
+          </div>
+          <div class="flex align-center justify-center">
+            <div class="flex">
+              <button class="closeModal def_btn bg-white">Close</button>  
+              <button class="addInfo def_btn bg-blue">Confirm</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <style type="text/css"></style>
+    <script src="../../static/js/jquery.js"></script>
+    <script src="../../static/js/select.js"></script>
+    <script src="../../static/js/request.js"></script>
+    <script src="../../static/js/storage.js"></script>
+    <script src="../../static/js/message.js"></script>
+    <script src="../../static/js/utils.js"></script>
+    <script>
+      $(function () {
+        let list = [];
+        let videoPath = "";
+        let update_id = 0;
+        let filePath = "";
+        let searchData = { type: 0 };
+        let logindata = load("logindata") || {};
+        function getList() {
+          let name = $("#coursewareName").val().trim();
+          let courseId = $(".filter-title").val();
+          let params = {
+            name,
+            ...searchData,
+          };
+          post(
+            "/courseware",
+            params || {},
+            function (res) {
+              if (res) {
+                list = res.data || [];
+                updateList();
+              }
+            },
+            function (err) {}
+          );
+        }
+        function getUser() {
+          post(
+            "/course",
+            {
+              userId: logindata.id,
+              [logindata.type === "Instructor" ? "teacherId" : "studentId"]:
+                logindata.id,
+            },
+            function (res) {
+              getList();
+              if (res) {
+                updateSelect(res.data);
+              }
+            },
+            function (err) {}
+          );
+        }
+        function updateSelect(list) {
+          $("#filter-select").html("");
+          $("#filter-select").append("<option selected value=''>All</option>");
+          if (list && list.length) {
+            $("#filter-select").append(
+              list.reduce(
+                (t, c) => (t += `<option value=${c.id}>${c.name}</option>`),
+                ""
+              )
+            );
+          }
+          $(".filter-box").selectFilter({
+            callBack: function (val) {
+              //返回选择的值
+              searchData.courseId = val;
+              console.log(val + "-是返回的值");
+            },
+          });
+        }
+        getUser();
+        $("#search").click(function () {
+          getList();
+        });
+        $(".closeModal").click(function () {
+          closeModal();
+        });
+        $("#list").on("click", "#download,#preview", function (e) {
+          if (e.target.id === "download") {
+            const url = $(this).parent().children().eq(2).text();
+            const link = document.createElement("a");
+            link.download = "file";
+            link.href = url;
+            link.click();
+          }
+          if (e.target.id === "preview") {
+            const path = $(this).text();
+            window.open(path);
+          }
+        });
+        $("#fileInput").on("change", function () {
+          let file = $(this)[0].files[0];
+          console.log("this===", this, file);
+          if (file) {
+            let formData = new FormData();
+            formData.append("file", file);
+            upload("/uploadFile", formData, function (res) {
+              filePath = res && res.data ? res.data.filePath || "" : "";
+              $("#file_name").text(filePath);
+              $("#file_name").attr("href", filePath);
+            });
+          } else {
+            console.log("No file selected.");
+          }
+        });
+        $(".addInfo").click(function () {
+          let name = $("#modal_courseware_name").val().trim();
+          let content = $("#modal_content").val().trim();
+          if (!name || !filePath || !content) {
+            $.message({
+              type: "error",
+              content: "The form is not filled out completely!",
+            });
+            return;
+          }
+          const data = list.find((item) => item.id === update_id);
+          post(
+            "/updateCourseware",
+            {
+              id: update_id,
+              courseId: data.courseId,
+              name,
+              content,
+              filePath,
+              type: 0,
+            },
+            function (res) {
+              getList();
+              closeModal();
+            },
+            function (err) {}
+          );
+        });
+        $("tbody").on(
+          "click",
+          "#delete,#update,#add,#preview,#download",
+          function (e) {
+            // Delete
+            if (e.target.id === "delete") {
+              let id = $(this)
+                .parent()
+                .parent()
+                .parent()
+                .children()
+                .eq(0)
+                .text();
+              post(
+                "/delCoursematerial",
+                {
+                  id,
+                },
+                function (res) {
+                  getList();
+                },
+                function (err) {}
+              );
+            }
+            if (e.target.id === "update") {
+              update_id = ~~$(this)
+                .parent()
+                .parent()
+                .parent()
+                .children()
+                .eq(0)
+                .text();
+              showModal();
+            }
+            if (e.target.id === "download") {
+              const url = $(this)
+                .parent()
+                .parent()
+                .parent()
+                .children()
+                .eq(3)
+                .text();
+              const link = document.createElement("a");
+              link.download = "file";
+              link.href = url;
+              link.click();
+            }
+            if (e.target.id === "preview") {
+              const path = $(this).parent().parent().children().eq(3).text();
+              window.open(path);
+            }
+          }
+        );
+
+        //渲染列表数据
+        function updateList() {
+          if (logindata.type === "Student") {
+            $(".tableBox").hide();
+            $(".search_form").hide();
+            $("#list").show();
+            $("#list").html("");
+            if (list && list.length) {
+              list.forEach((item) => {
+                $("#list").append(`
+              <div class="list_item text-red solid-bottom padding-tb margin-top">
+                <div>${item.name || ""}</div>
+                <div>${item.content || ""}</div>
+                <div id="preview" class="flex align-center pointer">
+                  <img
+                    class="file_icon margin-right-sm"
+                    src="../../static/images/file.png"
+                  />
+                  ${item.filePath || ""}
+                </div>
+                <div class="text-right pointer" id="download">download</div>
+              </div>
+              `);
+              });
+            }
+            return;
+          }
+          $("tbody").html("");
+          if (list && list.length) {
+            $("tbody").prepend(
+              list.reduce((t, c) => {
+                const footer = `<div class="w100 flex justify-around" style="margin: 10px 0">
+                  ${
+                    logindata.type === "Instructor"
+                      ? '<button id="update" class="td_btn bg-orange ">Modify</button>'
+                      : ""
+                  }
+                  ${
+                    (logindata.type === "Instructor" &&
+                      logindata.id === c.teacherId) ||
+                    logindata.type === "Admin"
+                      ? '<button id="delete" class="td_btn bg-red ">Delete</button>'
+                      : ""
+                  }
+                  <button id="download" class="td_btn bg-blue ">Download</button>
+                </div>`;
+                return (t += ` <tr class="w100 flex align-center">
+              <td class="w10">${c.id || ""}</td>
+              <td class="flex1">${c.name || ""}</td>
+              <td class="flex1">${c.courseName || ""}</td>
+              <td class="flex1 ellipsis pointer">
+                <a id="preview">${c.filePath || ""}</a>
+              </td>
+              <td class="flex1">${c.content || ""}</td>
+              <td style="width: 250px" >
+                ${footer}
+              </td>
+      </tr>`);
+              }, "")
+            );
+          }
+        }
+
+        function showModal() {
+          $(".modal").fadeIn();
+          if (update_id) {
+            const data = list.find((item) => item.id === update_id);
+            $("#modal_courseware_name").val(data.name);
+            $("#modal_content").val(data.content);
+            $("#file_name").text(data.filePath);
+            $("#file_name").attr("href", data.filePath);
+          }
+        }
+        function closeModal() {
+          $(".modal").fadeOut();
+          $("#modal_courseware_name").val("");
+          $(".modal_content").val("");
+          $("#file_name").text("");
+          filePath = "";
+          update_id = 0;
+        }
+      });
+    </script>
+  </body>
+</html>
